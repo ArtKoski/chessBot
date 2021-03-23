@@ -3,10 +3,13 @@ Kyseessä on shakkitekoäly, jossa käytän projektia 'TiraLabra/chess' pohjana.
 Olennainen ongelma on luoda tekoäly, joka pelaa 'fiksusti' ihmisen näkökulmasta. On myös tärkeää, että tekoäly pystyy laskemaan liikkeensä nopeasti.
 
 ## Tietorakenteet/algoritmit
-Haasteena tuleekin siis varmasti olemaan mahdollisten liikkeiden läpikäynti tehokkaasti, johon aion käyttää minimax algoritmia. Ominaisuudet jakautuvat mielestäni osaalueisiin:
-1. Pelitilanteen arviointi 
+Projekti jakautuu about kolmeen osaan:
+1. Laillisten liikkeiden generointi
 2. Minimaxin toteutus sekä Alpha-Beta pruning optimointiin
-3. Laillisten liikkeiden generointi (?) - En ole varma onko tätä tarkoitus tehdä itse. Jos on, niin se tulee viemään paljon aikaa.
+3. Pelitilanteen arviointi 
+
+## Laillisten liikkeiden generointi
+Tuntuu sen verran työläältä, että toistaiseksi on suunnitelmissa jättää ainakin 'en passant' ja tornitus pois. (riippuu kauan menee ihan perussiirtojen tekemisessä)
 
 ## Pelitilanteen arviointi
 Siirtoja vertaillaan toisiinsa niiden pistevaikutuksen perusteella. Tällöin **yksinkertaisimmillaan**:
@@ -24,14 +27,14 @@ Tehokkuden kannalta kaikista olennaisinta on, että 'turhien' siirtojen laskemis
 
 
 ## Minimax
-Minimax algoritmi käy läpi puuta, josta löytyy mahdolliset pelisiirrot ja niiden pistevaikutukset. Algoritmi etsii puusta ne siirrot, jotka tuottavat maksimaalisen/minimaalisen pistemäärän pelaajalle (maksimaalisen jos pelaa valkoisilla, ja minimaalisen jos mustilla). 
+Minimax algoritmi käy läpi puuta, josta löytyy mahdolliset pelisiirrot ja niiden pistevaikutukset. Algoritmi etsii puusta ne siirrot, jotka tuottavat maksimaalisen/minimaalisen pistemäärän pelaajalle (maksimaalisen jos pelaa valkoisilla, ja minimaalisen jos mustilla).
 Algoritmin aikavaativuus on O(b^n), 
 ja tilavaativuus O(bn), jossa
 b = lailliset siirrot sekä
 n = puun syvyys
 
-Epäselvää tällä hetkellä on:
-- Onko tarkoitus tehdä shakin 'säännöt' omalla toteutuksella, vai saako valmista MoveGenerator.generateLegalMoves() käyttää, joka siis palauttaa kaikki lailliset siirrot. Jos tämä on tarkoitus itse koodata, niin oletan, että tämä tulee olemaan hyvin työläs osa projektia.
+~~Epäselvää tällä hetkellä on:~~
+- ~~Onko tarkoitus tehdä shakin 'säännöt' omalla toteutuksella, vai saako valmista MoveGenerator.generateLegalMoves() käyttää, joka siis palauttaa kaikki lailliset siirrot. Jos tämä on tarkoitus itse koodata, niin oletan, että tämä tulee olemaan hyvin työläs osa projektia.~~
 
 Opinto-ohjelma: TKT kandi ja kielenä suomenkieli. Koska pohjaprojekti on koodattu sekä kommentoitu englanniksi, niin aion luultavasti tehdä koodin englanniksi.
 
@@ -40,4 +43,5 @@ Inspiraatio & lähteet
 [Yleisesti](https://www.freecodecamp.org/news/simple-chess-ai-step-by-step-1d55a9266977/)
 [Minimax](https://cis.temple.edu/~vasilis/Courses/CIS603/Lectures/l7.html)
 [Minimax, Alpha-Beta](https://github.com/carterjbastian/alpha-beta-chess-ai/blob/master/chess-ai.pdf)
+
 
