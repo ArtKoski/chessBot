@@ -54,7 +54,7 @@ public class BitOperations {
                     | ((currentBB & 0xff000000000000L) >> 16);
         }
         blackPawnAttacks[63] = 0x0040000000000000L;
-        blackPawnMoves[63] = 0x0080000000000000L;//bug again 
+        blackPawnMoves[63] = 0x0080000000000000L; //bug again 
     }
 
     /**
@@ -110,7 +110,8 @@ public class BitOperations {
     }
 
     /**
-     * Generates the bishop rays to different directions using some utility functions.
+     * Generates the bishop rays to different directions using some utility
+     * functions.
      */
     static {
         Square current;
@@ -238,9 +239,9 @@ public class BitOperations {
         }
         return bishopAttacks;
     }
-    
+
     public static long getQueenMoves(Square square, long occupied) {
-        return (getBishopMoves(square, occupied)|getRookMoves(square, occupied));
+        return (getBishopMoves(square, occupied) | getRookMoves(square, occupied));
     }
 
     /**

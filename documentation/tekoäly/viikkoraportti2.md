@@ -14,8 +14,14 @@ _____________________
 
 **Yhteenvetona** viikosta: rupeaa pikkuhiljaa aukeamaan bitboardien maailma, eikä enää tunnu siltä, että joutuu kokoajan katsomaan netistä apua. Magic Bitboardit toki ovat hieman mysteeri, mutta en tiedä onko niihin perehtyminen olennaista. Näillä näkymin liikkeiden generoinnin teemaan liittyen pitäisi vielä: 
  - Parannella torniin liittyviä metodeja (joka vaikuttaa myös kuningattareen)
+ - Metodista isMoveLegal() oma toteutus
  - Lisäillä testejä/Javadoc
  - Ainakin tornitus voisi olla melko vaivaton  
+
+
+Testauksesta:  
+Olen toistaiseksi testannut yksittäisen nappulan liikkeitä muutamassa eri skenaariossa mittaamalla saatujen mahdollisten liikkeiden määrää.
+Esim. nappulan liikkeet: tyhjällä laudalla, vihollisten ympäröimänä, kavereiden ympäröimänä jne.
 
 
 
