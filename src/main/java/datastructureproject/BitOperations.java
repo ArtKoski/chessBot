@@ -371,7 +371,7 @@ public class BitOperations {
      * Returns number of zero bits following the rightmost one-bit, which is the
      * index of the bit.
      *
-     * Utilizes javas own {@link Long.numberOfTrailingZeros}
+     * Utilizes javas own Long.numberOfTrailingZeros
      *
      * @param bitboard
      * @return index of the first one-bit (rightmost = 'lowest' index in
@@ -385,7 +385,7 @@ public class BitOperations {
      * Number of zero bits following the leftmost one-bit is reduced from 63 to
      * obtain the index of the 'highest' number in bitboard
      *
-     * Utilizes javas own {@link Long.numberOfLeadingZeros}
+     * Utilizes javas own Long.numberOfLeadingZeros
      *
      * @param bitboard
      * @return index of the first one-bit (leftmost = 'highest' index in
