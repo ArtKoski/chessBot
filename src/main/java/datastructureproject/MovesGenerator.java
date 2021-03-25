@@ -1,6 +1,5 @@
 package datastructureproject;
 
-import chess.engine.GameState;
 import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.Piece;
 import com.github.bhlangonijr.chesslib.PieceType;
@@ -21,10 +20,14 @@ public class MovesGenerator {
     public ArrayList<Move> GenerateLegalMoves(Board b) {
         bitboard = new BitOperations();
         ArrayList<Move> legalMoves = new ArrayList<>();
+        long ownPieces = b.getBitboard(b.getSideToMove());
 
-        generateKnightMoves(b, legalMoves, ~b.getBitboard(b.getSideToMove()));
+        generateKnightMoves(b, legalMoves, ~ownPieces);
         generatePawnMoves(b, legalMoves);
         generatePawnCaptures(b, legalMoves);
+        generateRookMoves(b, legalMoves);
+        generateBishopMoves(b, legalMoves);
+        generateKingMoves(b, legalMoves, ownPieces);
 
         //Here rest of 'generate' methods
         for (Iterator<Move> iterator = legalMoves.iterator(); iterator.hasNext();) {
@@ -70,6 +73,22 @@ public class MovesGenerator {
         }
     }
 
+    public void generateKingMoves(Board b, List<Move> moveList, long ownPieces) {
+        long king = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.KING));
+        int pieceIndex = BitOperations.bitScanForward(king);
+        Square squareCurrent = Square.squareAt(pieceIndex);
+        long moves = BitOperations.getKingMoves(squareCurrent, ownPieces);
+
+        while (moves != 0L) {
+            int targetIndex = BitOperations.bitScanForward(moves);
+            Square squareTarget = Square.squareAt(targetIndex);
+            Move newMove = new Move(squareCurrent, squareTarget, Piece.NONE);
+            moveList.add(newMove);
+
+            moves = BitOperations.removeLSB(moves);
+        }
+    }
+
     public void generatePawnMoves(Board b, List<Move> moveList) {
         long pawns = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.PAWN));
 
@@ -112,5 +131,70 @@ public class MovesGenerator {
             pawns = BitOperations.removeLSB(pawns);
         }
 
+    }
+
+    public void generateRookMoves(Board b, List<Move> moveList) {
+        long rooks = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.ROOK));
+
+        while (rooks != 0L) {
+            int pieceIndex = BitOperations.bitScanForward(rooks);
+            Square squareCurrent = Square.squareAt(pieceIndex);
+            long rookMovesPseudo = BitOperations.getRookMoves(squareCurrent, b.getBitboard());
+            long moves = rookMovesPseudo & ~b.getBitboard(b.getSideToMove());
+
+            while (moves != 0L) {
+                int targetIndex = BitOperations.bitScanForward(moves);
+                Square squareTarget = Square.squareAt(targetIndex);
+                Move newMove = new Move(squareCurrent, squareTarget, Piece.NONE);
+                moveList.add(newMove);
+
+                moves = BitOperations.removeLSB(moves);
+            }
+            rooks = BitOperations.removeLSB(rooks);
+
+        }
+
+    }
+
+    public void generateBishopMoves(Board b, List<Move> moveList) {
+        long bishops = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.BISHOP));
+
+        while (bishops != 0L) {
+            int pieceIndex = BitOperations.bitScanForward(bishops);
+            Square squareCurrent = Square.squareAt(pieceIndex);
+            long bishopMovesPseudo = BitOperations.getBishopMoves(squareCurrent, b.getBitboard());
+            long moves = bishopMovesPseudo & ~b.getBitboard(b.getSideToMove());
+
+            while (moves != 0L) {
+                int targetIndex = BitOperations.bitScanForward(moves);
+                Square squareTarget = Square.squareAt(targetIndex);
+                Move newMove = new Move(squareCurrent, squareTarget, Piece.NONE);
+                moveList.add(newMove);
+
+                moves = BitOperations.removeLSB(moves);
+            }
+            bishops = BitOperations.removeLSB(bishops);
+
+        }
+
+    }
+
+    public void generateQueenMoves(Board b, List<Move> moveList) {
+        long queen = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.BISHOP));
+
+        int pieceIndex = BitOperations.bitScanForward(queen);
+        Square squareCurrent = Square.squareAt(pieceIndex);
+        
+        long bishopMovesPseudo = BitOperations.getQueenMoves(squareCurrent, b.getBitboard());
+        long moves = bishopMovesPseudo & ~b.getBitboard(b.getSideToMove());
+
+        while (moves != 0L) {
+            int targetIndex = BitOperations.bitScanForward(moves);
+            Square squareTarget = Square.squareAt(targetIndex);
+            Move newMove = new Move(squareCurrent, squareTarget, Piece.NONE);
+            moveList.add(newMove);
+
+            moves = BitOperations.removeLSB(moves);
+        }
     }
 }

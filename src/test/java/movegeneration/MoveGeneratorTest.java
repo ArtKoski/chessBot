@@ -57,6 +57,7 @@ public class MoveGeneratorTest {
     public void tearDown() {
     }
 
+    //KNIGHT
     @Test
     public void KnightMovesAtStart() {
         knightMoves();
@@ -85,6 +86,7 @@ public class MoveGeneratorTest {
         gen.generateKnightMoves(b, moves, ~b.getBitboard(b.getSideToMove()));
     }
 
+    //PAWN
     @Test
     public void pawnMovesFromStart() {
         pawnMoves();
@@ -147,6 +149,147 @@ public class MoveGeneratorTest {
 
     public void pawnCaptures() {
         gen.generatePawnCaptures(b, moves);
+    }
+
+    //ROOK
+    @Test
+    public void rookMovesEmptyBoard() {
+        b.clear();
+        b.setPiece(Piece.WHITE_ROOK, Square.A1);
+        gen.generateRookMoves(b, moves);
+
+        assertEquals(14, moves.size());
+    }
+
+    @Test
+    public void rookMovesWhenBlockedByFriends() {
+        b.clear();
+        b.setPiece(Piece.WHITE_ROOK, Square.A1);
+        b.setPiece(Piece.WHITE_PAWN, Square.A2);
+        b.setPiece(Piece.WHITE_KNIGHT, Square.B1);
+        gen.generateRookMoves(b, moves);
+
+        assertEquals(0, moves.size());
+    }
+
+    @Test
+    public void rookMovesWhenBlockedBySingleEnemy() {
+        b.clear();
+        b.setPiece(Piece.WHITE_ROOK, Square.A1);
+        b.setPiece(Piece.WHITE_PAWN, Square.A2);
+        b.setPiece(Piece.BLACK_KNIGHT, Square.B1);
+        gen.generateRookMoves(b, moves);
+
+        assertEquals(1, moves.size());
+    }
+
+    @Test
+    public void rookMovesWhenEnemyIsFurther() {
+        b.clear();
+        b.setPiece(Piece.WHITE_ROOK, Square.A1);
+        b.setPiece(Piece.WHITE_PAWN, Square.A2);
+        b.setPiece(Piece.BLACK_KNIGHT, Square.C1);
+        gen.generateRookMoves(b, moves);
+
+        assertEquals(2, moves.size());
+    }
+
+    @Test
+    public void rookMovesWhenSurroundedByEnemies() {
+        b.clear();
+        b.setPiece(Piece.WHITE_ROOK, Square.C3);
+        b.setPiece(Piece.BLACK_PAWN, Square.C2);
+        b.setPiece(Piece.BLACK_KNIGHT, Square.C4);
+        b.setPiece(Piece.BLACK_PAWN, Square.B3);
+        b.setPiece(Piece.BLACK_KNIGHT, Square.D3);
+        gen.generateRookMoves(b, moves);
+
+        assertEquals(4, moves.size());
+    }
+
+    //BISHOP
+    @Test
+    public void bishopC3MovesEmptyBoard() {
+        b.clear();
+        b.setPiece(Piece.WHITE_BISHOP, Square.C3);
+        gen.generateBishopMoves(b, moves);
+
+        assertEquals(11, moves.size());
+    }
+
+    @Test
+    public void bishopB2MovesEmptyBoard() {
+        b.clear();
+        b.setPiece(Piece.WHITE_BISHOP, Square.B2);
+        gen.generateBishopMoves(b, moves);
+
+        assertEquals(9, moves.size());
+    }
+
+    @Test
+    public void bishopBlockedByEnemiesClose() {
+        b.clear();
+        b.setPiece(Piece.WHITE_BISHOP, Square.B2);
+        b.setPiece(Piece.BLACK_BISHOP, Square.A1);
+        b.setPiece(Piece.BLACK_BISHOP, Square.A3);
+        b.setPiece(Piece.BLACK_KNIGHT, Square.C1);
+        b.setPiece(Piece.BLACK_KNIGHT, Square.C3);
+        gen.generateBishopMoves(b, moves);
+        System.out.println(moves);
+        
+        assertEquals(4, moves.size());
+    }
+    @Test
+    public void bishopBlockedByEnemiesFurther() {
+        b.clear();
+        b.setPiece(Piece.WHITE_BISHOP, Square.C3);
+        b.setPiece(Piece.BLACK_BISHOP, Square.A1);
+        b.setPiece(Piece.BLACK_BISHOP, Square.E1);
+        b.setPiece(Piece.BLACK_KNIGHT, Square.G7);
+        b.setPiece(Piece.BLACK_KNIGHT, Square.B4);
+        gen.generateBishopMoves(b, moves);
+        
+        System.out.println(moves);
+        assertEquals(9, moves.size());
+    }
+    @Test
+    public void bishopBlockedByFriends() {
+        b.clear();
+        b.setPiece(Piece.WHITE_BISHOP, Square.B2);
+        b.setPiece(Piece.WHITE_KNIGHT, Square.A1);
+        b.setPiece(Piece.WHITE_KNIGHT, Square.A3);
+        b.setPiece(Piece.WHITE_KING, Square.C1);
+        b.setPiece(Piece.WHITE_PAWN, Square.C3);
+        gen.generateBishopMoves(b, moves);
+        
+        assertEquals(0, moves.size());
+    }
+
+    
+    //KING
+    @Test
+    public void kingMovesAtStart() {
+        gen.generateKingMoves(b, moves, b.getBitboard(b.getSideToMove()));
+        assertEquals(0, moves.size());
+    }
+
+    @Test
+    public void kingMovesEmptyBoard() {
+        b.clear();
+        b.setPiece(Piece.WHITE_KING, Square.C4);
+
+        gen.generateKingMoves(b, moves, b.getBitboard(b.getSideToMove()));
+        assertEquals(8, moves.size());
+    }
+
+    @Test
+    public void kingCanEatEnemies() {
+        b.clear();
+        b.setPiece(Piece.WHITE_KING, Square.C4);
+        b.setPiece(Piece.BLACK_PAWN, Square.C3);
+
+        gen.generateKingMoves(b, moves, b.getBitboard(b.getSideToMove()));
+        assertEquals(8, moves.size());
     }
 
 }

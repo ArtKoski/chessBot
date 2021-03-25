@@ -1,5 +1,6 @@
 package datastructureproject;
 
+import com.github.bhlangonijr.chesslib.File;
 import com.github.bhlangonijr.chesslib.Rank;
 import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
@@ -10,83 +11,161 @@ import com.github.bhlangonijr.chesslib.Square;
 public class BitOperations {
 
     //Copied from bhlangonijr's chesslib.
-    private static final long[] knightAttacks = {
-        0x0000000000020400L, 0x0000000000050800L, 0x00000000000a1100L, 0x0000000000142200L, 0x0000000000284400L, 0x0000000000508800L, 0x0000000000a01000L, 0x0000000000402000L,
-        0x0000000002040004L, 0x0000000005080008L, 0x000000000a110011L, 0x0000000014220022L, 0x0000000028440044L, 0x0000000050880088L, 0x00000000a0100010L, 0x0000000040200020L,
-        0x0000000204000402L, 0x0000000508000805L, 0x0000000a1100110aL, 0x0000001422002214L, 0x0000002844004428L, 0x0000005088008850L, 0x000000a0100010a0L, 0x0000004020002040L,
-        0x0000020400040200L, 0x0000050800080500L, 0x00000a1100110a00L, 0x0000142200221400L, 0x0000284400442800L, 0x0000508800885000L, 0x0000a0100010a000L, 0x0000402000204000L,
-        0x0002040004020000L, 0x0005080008050000L, 0x000a1100110a0000L, 0x0014220022140000L, 0x0028440044280000L, 0x0050880088500000L, 0x00a0100010a00000L, 0x0040200020400000L,
-        0x0204000402000000L, 0x0508000805000000L, 0x0a1100110a000000L, 0x1422002214000000L, 0x2844004428000000L, 0x5088008850000000L, 0xa0100010a0000000L, 0x4020002040000000L,
-        0x0400040200000000L, 0x0800080500000000L, 0x1100110a00000000L, 0x2200221400000000L, 0x4400442800000000L, 0x8800885000000000L, 0x100010a000000000L, 0x2000204000000000L,
-        0x0004020000000000L, 0x0008050000000000L, 0x00110a0000000000L, 0x0022140000000000L, 0x0044280000000000L, 0x0088500000000000L, 0x0010a00000000000L, 0x0020400000000000L
+    final static long[] rankBB = {
+        0x00000000000000FFL, 0x000000000000FF00L, 0x0000000000FF0000L, 0x00000000FF000000L,
+        0x000000FF00000000L, 0x0000FF0000000000L, 0x00FF000000000000L, 0xFF00000000000000L
+    };
+    final static long[] fileBB = {
+        0x0101010101010101L, 0x0202020202020202L, 0x0404040404040404L, 0x0808080808080808L,
+        0x1010101010101010L, 0x2020202020202020L, 0x4040404040404040L, 0x8080808080808080L
     };
 
-    final static long[] whitePawnMoves = {
-        0x0000000000000100L, 0x0000000000000200L, 0x0000000000000400L, 0x0000000000000800L, 0x0000000000001000L, 0x0000000000002000L, 0x0000000000004000L, 0x0000000000008000L,
-        0x0000000001010000L, 0x0000000002020000L, 0x0000000004040000L, 0x0000000008080000L, 0x0000000010100000L, 0x0000000020200000L, 0x0000000040400000L, 0x0000000080800000L,
-        0x0000000001000000L, 0x0000000002000000L, 0x0000000004000000L, 0x0000000008000000L, 0x0000000010000000L, 0x0000000020000000L, 0x0000000040000000L, 0x0000000080000000L,
-        0x0000000100000000L, 0x0000000200000000L, 0x0000000400000000L, 0x0000000800000000L, 0x0000001000000000L, 0x0000002000000000L, 0x0000004000000000L, 0x0000008000000000L,
-        0x0000010000000000L, 0x0000020000000000L, 0x0000040000000000L, 0x0000080000000000L, 0x0000100000000000L, 0x0000200000000000L, 0x0000400000000000L, 0x0000800000000000L,
-        0x0001000000000000L, 0x0002000000000000L, 0x0004000000000000L, 0x0008000000000000L, 0x0010000000000000L, 0x0020000000000000L, 0x0040000000000000L, 0x0080000000000000L,
-        0x0100000000000000L, 0x0200000000000000L, 0x0400000000000000L, 0x0800000000000000L, 0x1000000000000000L, 0x2000000000000000L, 0x4000000000000000L, 0x8000000000000000L,
-        0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L
-    };
+    private static final long[] knightAttacks = new long[64];
+    private static final long[] rookRays = new long[64];
+    private static final long[][] bishopRays = new long[4][64];
 
-    final static long[] blackPawnMoves = {
-        0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L,
-        0x0000000000000001L, 0x0000000000000002L, 0x0000000000000004L, 0x0000000000000008L, 0x0000000000000010L, 0x0000000000000020L, 0x0000000000000040L, 0x0000000000000080L,
-        0x0000000000000100L, 0x0000000000000200L, 0x0000000000000400L, 0x0000000000000800L, 0x0000000000001000L, 0x0000000000002000L, 0x0000000000004000L, 0x0000000000008000L,
-        0x0000000000010000L, 0x0000000000020000L, 0x0000000000040000L, 0x0000000000080000L, 0x0000000000100000L, 0x0000000000200000L, 0x0000000000400000L, 0x0000000000800000L,
-        0x0000000001000000L, 0x0000000002000000L, 0x0000000004000000L, 0x0000000008000000L, 0x0000000010000000L, 0x0000000020000000L, 0x0000000040000000L, 0x0000000080000000L,
-        0x0000000100000000L, 0x0000000200000000L, 0x0000000400000000L, 0x0000000800000000L, 0x0000001000000000L, 0x0000002000000000L, 0x0000004000000000L, 0x0000008000000000L,
-        0x0000010100000000L, 0x0000020200000000L, 0x0000040400000000L, 0x0000080800000000L, 0x0000101000000000L, 0x0000202000000000L, 0x0000404000000000L, 0x0000808000000000L,
-        0x0001000000000000L, 0x0002000000000000L, 0x0004000000000000L, 0x0008000000000000L, 0x0010000000000000L, 0x0020000000000000L, 0x0040000000000000L, 0x0080000000000000L
-    };
+    final static long[] whitePawnMoves = new long[64];
 
-    final static long[] whitePawnAttacks = {
-        0x0000000000000200L, 0x0000000000000500L, 0x0000000000000a00L, 0x0000000000001400L, 0x0000000000002800L, 0x0000000000005000L, 0x000000000000a000L, 0x0000000000004000L,
-        0x0000000000020000L, 0x0000000000050000L, 0x00000000000a0000L, 0x0000000000140000L, 0x0000000000280000L, 0x0000000000500000L, 0x0000000000a00000L, 0x0000000000400000L,
-        0x0000000002000000L, 0x0000000005000000L, 0x000000000a000000L, 0x0000000014000000L, 0x0000000028000000L, 0x0000000050000000L, 0x00000000a0000000L, 0x0000000040000000L,
-        0x0000000200000000L, 0x0000000500000000L, 0x0000000a00000000L, 0x0000001400000000L, 0x0000002800000000L, 0x0000005000000000L, 0x000000a000000000L, 0x0000004000000000L,
-        0x0000020000000000L, 0x0000050000000000L, 0x00000a0000000000L, 0x0000140000000000L, 0x0000280000000000L, 0x0000500000000000L, 0x0000a00000000000L, 0x0000400000000000L,
-        0x0002000000000000L, 0x0005000000000000L, 0x000a000000000000L, 0x0014000000000000L, 0x0028000000000000L, 0x0050000000000000L, 0x00a0000000000000L, 0x0040000000000000L,
-        0x0200000000000000L, 0x0500000000000000L, 0x0a00000000000000L, 0x1400000000000000L, 0x2800000000000000L, 0x5000000000000000L, 0xa000000000000000L, 0x4000000000000000L,
-        0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L
-    };
+    final static long[] blackPawnMoves = new long[64];
 
-    final static long[] blackPawnAttacks = {
-        0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L, 0x0000000000000000L,
-        0x0000000000000002L, 0x0000000000000005L, 0x000000000000000aL, 0x0000000000000014L, 0x0000000000000028L, 0x0000000000000050L, 0x00000000000000a0L, 0x0000000000000040L,
-        0x0000000000000200L, 0x0000000000000500L, 0x0000000000000a00L, 0x0000000000001400L, 0x0000000000002800L, 0x0000000000005000L, 0x000000000000a000L, 0x0000000000004000L,
-        0x0000000000020000L, 0x0000000000050000L, 0x00000000000a0000L, 0x0000000000140000L, 0x0000000000280000L, 0x0000000000500000L, 0x0000000000a00000L, 0x0000000000400000L,
-        0x0000000002000000L, 0x0000000005000000L, 0x000000000a000000L, 0x0000000014000000L, 0x0000000028000000L, 0x0000000050000000L, 0x00000000a0000000L, 0x0000000040000000L,
-        0x0000000200000000L, 0x0000000500000000L, 0x0000000a00000000L, 0x0000001400000000L, 0x0000002800000000L, 0x0000005000000000L, 0x000000a000000000L, 0x0000004000000000L,
-        0x0000020000000000L, 0x0000050000000000L, 0x00000a0000000000L, 0x0000140000000000L, 0x0000280000000000L, 0x0000500000000000L, 0x0000a00000000000L, 0x0000400000000000L,
-        0x0002000000000000L, 0x0005000000000000L, 0x000a000000000000L, 0x0014000000000000L, 0x0028000000000000L, 0x0050000000000000L, 0x00a0000000000000L, 0x0040000000000000L
-    };
+    final static long[] whitePawnAttacks = new long[64];
 
-    final static long[] adjacentSquares = {
-        0x0000000000000302L, 0x0000000000000705L, 0x0000000000000e0aL, 0x0000000000001c14L, 0x0000000000003828L, 0x0000000000007050L, 0x000000000000e0a0L, 0x000000000000c040L,
-        0x0000000000030203L, 0x0000000000070507L, 0x00000000000e0a0eL, 0x00000000001c141cL, 0x0000000000382838L, 0x0000000000705070L, 0x0000000000e0a0e0L, 0x0000000000c040c0L,
-        0x0000000003020300L, 0x0000000007050700L, 0x000000000e0a0e00L, 0x000000001c141c00L, 0x0000000038283800L, 0x0000000070507000L, 0x00000000e0a0e000L, 0x00000000c040c000L,
-        0x0000000302030000L, 0x0000000705070000L, 0x0000000e0a0e0000L, 0x0000001c141c0000L, 0x0000003828380000L, 0x0000007050700000L, 0x000000e0a0e00000L, 0x000000c040c00000L,
-        0x0000030203000000L, 0x0000070507000000L, 0x00000e0a0e000000L, 0x00001c141c000000L, 0x0000382838000000L, 0x0000705070000000L, 0x0000e0a0e0000000L, 0x0000c040c0000000L,
-        0x0003020300000000L, 0x0007050700000000L, 0x000e0a0e00000000L, 0x001c141c00000000L, 0x0038283800000000L, 0x0070507000000000L, 0x00e0a0e000000000L, 0x00c040c000000000L,
-        0x0302030000000000L, 0x0705070000000000L, 0x0e0a0e0000000000L, 0x1c141c0000000000L, 0x3828380000000000L, 0x7050700000000000L, 0xe0a0e00000000000L, 0xc040c00000000000L,
-        0x0203000000000000L, 0x0507000000000000L, 0x0a0e000000000000L, 0x141c000000000000L, 0x2838000000000000L, 0x5070000000000000L, 0xa0e0000000000000L, 0x40c0000000000000L
-    };
+    final static long[] blackPawnAttacks = new long[64];
+
+    final static long[] adjacentSquares = new long[64];
+
+    static {
+        Square current;
+        long currentBB;
+        for (int x = 0; x <= 63; x++) {
+            current = Square.squareAt(x);
+            currentBB = current.getBitboard();
+
+            whitePawnAttacks[x] |= ((currentBB & 0x7f7f7f7f7f7f7fL) << 9)
+                    | ((currentBB & 0xfefefefefefefeL) << 7);
+
+            whitePawnMoves[x] |= ((currentBB & 0xffffffffffffffL) << 8)
+                    | ((currentBB & 0xff00L) << 16);
+
+            blackPawnAttacks[x] |= ((currentBB & 0xfefefefefefefe00L) >> 9)
+                    | ((currentBB & 0x7f7f7f7f7f7f7f00L) >> 7);
+
+            blackPawnMoves[x] |= ((currentBB & 0xffffffffffffff00L) >> 8)
+                    | ((currentBB & 0xff000000000000L) >> 16);
+        }
+        blackPawnAttacks[63] = 0x0040000000000000L;
+        blackPawnMoves[63] = 0x0080000000000000L;//bug again 
+    }
 
     /**
-     *
-     *
-     * @param square of the attacker
-     * @param ownPieces long representation of own pieces to use as a mask
-     * @return
+     * Generates possible knight moves.
      */
+    static {
+        Square current;
+        long currentBB;
+        long attacks;
+        for (int x = 0; x <= 62; x++) {
+            attacks = 0L;
+            current = Square.squareAt(x);
+            currentBB = current.getBitboard();                   //Masks:
+            attacks |= ((currentBB & 0x00007F7F7F7F7F7FL) << 17) //All but ranks 7,8 and file H
+                    | ((currentBB & 0x003F3F3F3F3F3F3FL) << 10) //All but rank 8 and files G,H
+                    | ((currentBB & 0x3F3F3F3F3F3F3F00L) >> 6) //ETC.
+                    | ((currentBB & 0x7F7F7F7F7F7F0000L) >> 15)
+                    | ((currentBB & 0x0000FEFEFEFEFEFEL) << 15)
+                    | ((currentBB & 0x00FCFCFCFCFCFCFCL) << 6)
+                    | ((currentBB & 0xFCFCFCFCFCFCFC00L) >> 10)
+                    | ((currentBB & 0xFEFEFEFEFEFE0000L) >> 17);
+
+            knightAttacks[x] = attacks;
+
+        }
+        knightAttacks[63] = 0x0020400000000000L; //Weird bug (had to hardcode this)
+    }
+
+    /**
+     * Generates adjacent squares for every square
+     */
+    static {
+        Square current;
+        long currentBB;
+        long attacks;
+        for (int x = 0; x <= 62; x++) {
+            attacks = 0L;
+            current = Square.squareAt(x);
+            currentBB = current.getBitboard();
+
+            attacks |= ((currentBB & 0xffffffffffffff00L) >> 8) //All but ranks 7,8 and file H
+                    | ((currentBB & 0xffffffffffffffL) << 8) //All but rank 8 and files G,H
+                    | ((currentBB & 0xfefefefefefefefeL) >> 1) //ETC.
+                    | ((currentBB & 0x7f7f7f7f7f7f7f7fL) << 1)
+                    | ((currentBB & 0xfefefefefefefe00L) >> 9)
+                    | ((currentBB & 0x7f7f7f7f7f7f7fL) << 9)
+                    | ((currentBB & 0x7f7f7f7f7f7f7f00L) >> 7)
+                    | ((currentBB & 0xfefefefefefefeL) << 7);
+
+            adjacentSquares[x] = attacks;
+        }
+        adjacentSquares[63] = 0x40c0000000000000L;
+    }
+
+    /**
+     * Generates the bishop rays to different directions using some utility functions.
+     */
+    static {
+        Square current;
+        for (int x = 0; x <= 63; x++) {
+
+            current = Square.squareAt(x);
+            bishopRays[0][x] = getBishopRaysSENW(current, "NW");
+            bishopRays[1][x] = getBishopRaysNESW(current, "NE");
+            bishopRays[2][x] = getBishopRaysSENW(current, "SE");
+            bishopRays[3][x] = getBishopRaysNESW(current, "SW");
+        }
+    }
+
+    public static long[] getKnightAttacks() {
+        return knightAttacks;
+    }
+
+    public static long[] getAdjacentSquares() {
+        return adjacentSquares;
+    }
+
+    public static long[][] getBishopRays() {
+        return bishopRays;
+    }
+
+    public static long[] getWhitePawnMoves() {
+        return whitePawnMoves;
+    }
+
+    public static long[] getBlackPawnMoves() {
+        return blackPawnMoves;
+    }
+
+    public static long[] getBlackPawnAttacks() {
+        return blackPawnAttacks;
+    }
+
+    public static long[] getWhitePawnAttacks() {
+        return whitePawnAttacks;
+    }
+
     public static long getKnightMoves(Square square, long ownPieces) {
         return knightAttacks[square.ordinal()] & ownPieces;
     }
 
+    /**
+     * Returns available pawn moves (not captures). If no pieces on the way, the
+     * moves are returned after an AND operation with the possible moves and the
+     * unoccupied squares.
+     *
+     * @param square
+     * @param side
+     * @param allPieces
+     * @return
+     */
     public static long getPawnMoves(Square square, Side side, long allPieces) {
         long pawnMoves;
         long occupied = allPieces;
@@ -98,12 +177,12 @@ public class BitOperations {
                     return 0L;
                 }
             }
-            pawnMoves = whitePawnMoves[square.ordinal()] & ~occupied;
+            pawnMoves = whitePawnMoves[square.ordinal()] & ~occupied; //available moves have to be both natural and unoccupied
         } else {
             if (square.getRank().equals(Rank.RANK_7)) {
-                long squareInFront = square.getBitboard() >> 8;   
-                long pieceInFront = squareInFront & occupied;       
-                if (pieceInFront != 0L) {                           
+                long squareInFront = square.getBitboard() >> 8;
+                long pieceInFront = squareInFront & occupied;
+                if (pieceInFront != 0L) {
                     return 0L;
 
                 }
@@ -135,8 +214,151 @@ public class BitOperations {
     }
 
     /**
+     * Goes through all the directions (NE,SW,NW,SE) and uses masks and
+     * forward/reverse scan to figure calculate bishops possible attack squares.
+     *
+     * @param square
+     * @param occupied
+     * @return
+     */
+    public static long getBishopMoves(Square square, long occupied) {
+        long bishopAttacks = 0L;
+        int occupierIndex;
+        for (int i = 0; i < 4; i++) {
+            bishopAttacks |= bishopRays[i][square.ordinal()];
+            if ((bishopRays[i][square.ordinal()] & occupied) != 0L) {
+                if (i < 2) {
+                    occupierIndex = bitScanForward((bishopRays[i][square.ordinal()] & occupied));
+                } else {
+                    occupierIndex = bitScanReverse((bishopRays[i][square.ordinal()] & occupied));
+                }
+                bishopAttacks &= ~bishopRays[i][occupierIndex];                 //Leave out squares after the blocker
+
+            }
+        }
+        return bishopAttacks;
+    }
+    
+    public static long getQueenMoves(Square square, long occupied) {
+        return (getBishopMoves(square, occupied)|getRookMoves(square, occupied));
+    }
+
+    /**
+     * Need to clean up a little Calculates the diagonals from the defined
+     * square. Handles NE and SW rays. (North-East, South-West) Used for
+     * generating a pre-calculated array for the bishops 'rays'.
+     *
+     * @param square
+     * @param way
+     * @return
+     */
+    public static long getBishopRaysNESW(Square square, String way) {
+        long bishopAttacks = 0L;
+        long nextSquare;
+        Square tempSquare = square;
+
+        while (!((way.equals("NE")) ? tempSquare.getFile().equals(File.FILE_H) | tempSquare.getRank().equals(Rank.RANK_8) : tempSquare.getFile().equals(File.FILE_A) | tempSquare.getRank().equals(Rank.RANK_1))) {
+            nextSquare = (way.equals("NE")) ? tempSquare.getBitboard() << 9 : tempSquare.getBitboard() >> 9;
+            bishopAttacks |= nextSquare;
+
+            tempSquare = Square.squareAt(bitScanForward(nextSquare));
+        }
+        return bishopAttacks;
+
+    }
+
+    /**
+     * Calculates the diagonals from the defined square. Handles SE and NW rays
+     * (South-East, North-West). Used for generating a pre-calculated array for
+     * the bishops 'rays'.
+     *
+     * @param square
+     * @param way
+     * @return
+     */
+    public static long getBishopRaysSENW(Square square, String way) {
+        long bishopAttacks = 0L;
+        long nextSquare;
+        Square tempSquare = square;
+
+        while (!((way.equals("NW")) ? tempSquare.getFile().equals(File.FILE_A) | tempSquare.getRank().equals(Rank.RANK_8) : tempSquare.getFile().equals(File.FILE_H) | tempSquare.getRank().equals(Rank.RANK_1))) {
+            nextSquare = (way.equals("NW")) ? tempSquare.getBitboard() << 7 : tempSquare.getBitboard() >> 7;
+            bishopAttacks |= nextSquare;
+
+            tempSquare = Square.squareAt(bitScanForward(nextSquare));
+        }
+        return bishopAttacks;
+    }
+
+    /**
+     * Needs rework.
+     *
+     * @param square
+     * @param occupied
+     * @return
+     */
+    public static long getRookMoves(Square square, long occupied) {
+
+        long rookAttacks = getRookFileAttacks(square, occupied, "RIGHT")
+                | getRookFileAttacks(square, occupied, "LEFT")
+                | getRookRankAttacks(square, occupied, "UP")
+                | getRookRankAttacks(square, occupied, "DOWN");
+
+        return rookAttacks;
+    }
+
+    public static long getRookFileAttacks(Square square, long occupied, String way) {
+        long rookAttacks = 0L;
+        long nextSquare;
+        Square tempSquare = square;
+
+        File borderFile = (way.equals("RIGHT")) ? File.FILE_H : File.FILE_A;
+
+        while (!tempSquare.getFile().equals(borderFile)) {
+            nextSquare = (borderFile.equals(File.FILE_H)) ? tempSquare.getBitboard() << 1 : tempSquare.getBitboard() >> 1;
+            long nextPiece = nextSquare & occupied;
+            if (nextPiece != 0L) {
+                rookAttacks |= nextSquare;
+                break;
+            }
+            rookAttacks |= nextSquare;
+
+            tempSquare = Square.squareAt(bitScanForward(nextSquare));
+        }
+        return rookAttacks;
+
+    }
+
+    public static long getRookRankAttacks(Square square, long occupied, String way) {
+        long rookAttacks = 0L;
+        long nextSquare;
+        Square tempSquare = square;
+
+        Rank borderRank = (way.equals("UP")) ? Rank.RANK_8 : Rank.RANK_1;
+
+        while (!tempSquare.getRank().equals(borderRank)) {
+            nextSquare = (borderRank.equals(Rank.RANK_8)) ? tempSquare.getBitboard() << 8 : tempSquare.getBitboard() >> 8;
+            long nextPiece = nextSquare & occupied;
+            if (nextPiece != 0L) {
+                rookAttacks |= nextSquare;
+                break;
+            }
+            rookAttacks |= nextSquare;
+
+            tempSquare = Square.squareAt(bitScanForward(nextSquare));
+        }
+        return rookAttacks;
+
+    }
+
+    public static long getKingMoves(Square square, long ownPieces) {
+        return adjacentSquares[square.ordinal()] & ~ownPieces;
+    }
+
+    /**
      * AND operation between current bitboard and one decimal smaller bitboard.
-     * Results in removing the rightmost ('least significant') bit.
+     * Results in removing the rightmost ('least significant') bit. Used for
+     * iterating through pieces on a bitboard.
      *
      * @param bitboard
      * @return
@@ -146,14 +368,30 @@ public class BitOperations {
     }
 
     /**
-     * Returns number of zero bits following the rightmost one-bit.
+     * Returns number of zero bits following the rightmost one-bit, which is the
+     * index of the bit.
      *
      * Utilizes javas own {@link Long.numberOfTrailingZeros}
      *
      * @param bitboard
-     * @return index of the first one-bit
+     * @return index of the first one-bit (rightmost = 'lowest' index in
+     * bitboard)
      */
     public static int bitScanForward(long bitboard) {
         return Long.numberOfTrailingZeros(bitboard);
+    }
+
+    /**
+     * Number of zero bits following the leftmost one-bit is reduced from 63 to
+     * obtain the index of the 'highest' number in bitboard
+     *
+     * Utilizes javas own {@link Long.numberOfLeadingZeros}
+     *
+     * @param bitboard
+     * @return index of the first one-bit (leftmost = 'highest' index in
+     * bitboard)
+     */
+    public static int bitScanReverse(long bitboard) {
+        return 63 - Long.numberOfLeadingZeros(bitboard);
     }
 }
