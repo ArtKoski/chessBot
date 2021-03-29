@@ -118,7 +118,7 @@ public class MovesGenerator {
         while (pawns != 0L) {
             int pieceIndex = BitOperations.bitScanForward(pawns);
             Square squareCurrent = Square.squareAt(pieceIndex);
-            long captures = BitOperations.getPawnCaptures(squareCurrent, enemyPieces, b.getSideToMove());
+            long captures = BitOperations.getPawnCaptures(squareCurrent, b.getSideToMove(), enemyPieces);
             while (captures != 0L) {
                 int targetIndex = BitOperations.bitScanForward(captures);
                 Square squareTarget = Square.squareAt(targetIndex);

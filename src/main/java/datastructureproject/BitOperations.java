@@ -10,18 +10,26 @@ import com.github.bhlangonijr.chesslib.Square;
  */
 public class BitOperations {
 
-    //Copied from bhlangonijr's chesslib.
-    final static long[] rankBB = {
+    //Each rank and file as bitboards
+    final static long[] rank = {
         0x00000000000000FFL, 0x000000000000FF00L, 0x0000000000FF0000L, 0x00000000FF000000L,
         0x000000FF00000000L, 0x0000FF0000000000L, 0x00FF000000000000L, 0xFF00000000000000L
     };
-    final static long[] fileBB = {
+    final static long[] file = {
         0x0101010101010101L, 0x0202020202020202L, 0x0404040404040404L, 0x0808080808080808L,
         0x1010101010101010L, 0x2020202020202020L, 0x4040404040404040L, 0x8080808080808080L
     };
 
     private static final long[] knightAttacks = new long[64];
-    private static final long[] rookRays = new long[64];
+
+    /**
+     * [0,1,2,3] = N, E, S W
+     */
+    private static final long[][] rookRays = new long[4][64];
+
+    /**
+     * [0,1,2,3] = NW, NE, SE, SW
+     */
     private static final long[][] bishopRays = new long[4][64];
 
     final static long[] whitePawnMoves = new long[64];
@@ -95,9 +103,9 @@ public class BitOperations {
             current = Square.squareAt(x);
             currentBB = current.getBitboard();
 
-            attacks |= ((currentBB & 0xffffffffffffff00L) >> 8) //All but ranks 7,8 and file H
-                    | ((currentBB & 0xffffffffffffffL) << 8) //All but rank 8 and files G,H
-                    | ((currentBB & 0xfefefefefefefefeL) >> 1) //ETC.
+            attacks |= ((currentBB & 0xffffffffffffff00L) >> 8)
+                    | ((currentBB & 0xffffffffffffffL) << 8)
+                    | ((currentBB & 0xfefefefefefefefeL) >> 1)
                     | ((currentBB & 0x7f7f7f7f7f7f7f7fL) << 1)
                     | ((currentBB & 0xfefefefefefefe00L) >> 9)
                     | ((currentBB & 0x7f7f7f7f7f7f7fL) << 9)
@@ -114,14 +122,31 @@ public class BitOperations {
      * functions.
      */
     static {
-        Square current;
+        long current;
         for (int x = 0; x <= 63; x++) {
 
-            current = Square.squareAt(x);
+            current = Square.squareAt(x).getBitboard();
+
             bishopRays[0][x] = getBishopRaysSENW(current, "NW");
             bishopRays[1][x] = getBishopRaysNESW(current, "NE");
             bishopRays[2][x] = getBishopRaysSENW(current, "SE");
             bishopRays[3][x] = getBishopRaysNESW(current, "SW");
+        }
+    }
+
+    /**
+     * Generates the rook rays to different directions using some utility
+     * functions.
+     */
+    static {
+        long current;
+        for (int x = 0; x <= 63; x++) {
+
+            current = Square.squareAt(x).getBitboard();
+            rookRays[0][x] = getRookFileRays(current, "NORTH");
+            rookRays[1][x] = getRookRankRays(current, "EAST");
+            rookRays[2][x] = getRookFileRays(current, "SOUTH");
+            rookRays[3][x] = getRookRankRays(current, "WEST");
         }
     }
 
@@ -135,6 +160,10 @@ public class BitOperations {
 
     public static long[][] getBishopRays() {
         return bishopRays;
+    }
+
+    public static long[][] getRookRays() {
+        return rookRays;
     }
 
     public static long[] getWhitePawnMoves() {
@@ -162,14 +191,14 @@ public class BitOperations {
      * moves are returned after an AND operation with the possible moves and the
      * unoccupied squares.
      *
-     * @param square
-     * @param side
-     * @param allPieces
+     * @param square of the pawn in question
+     * @param side of the pawn in question
+     * @param occupied = bitboard representing all pieces (=all occupied
+     * squares)
      * @return
      */
-    public static long getPawnMoves(Square square, Side side, long allPieces) {
+    public static long getPawnMoves(Square square, Side side, long occupied) {
         long pawnMoves;
-        long occupied = allPieces;
         if (side.equals(Side.WHITE)) {
             if (square.getRank().equals(Rank.RANK_2)) {
                 long squareInFront = square.getBitboard() << 8;     //Bit shift to get the square in front of pawn
@@ -196,14 +225,14 @@ public class BitOperations {
     }
 
     /**
-     * Return normal pawn attacks. No 'en passant' atm.
+     * Return normal (diagonal) pawn captures. No 'en passant' atm.
      *
-     * @param square
-     * @param enemyPieces
-     * @param side
-     * @return
+     * @param square of the pawn in question
+     * @param enemyPieces bitboard representing enemy pieces squares
+     * @param side of the pawn in question
+     * @return bitboard of pseudolegal pawn attacks
      */
-    public static long getPawnCaptures(Square square, long enemyPieces, Side side) {
+    public static long getPawnCaptures(Square square, Side side, long enemyPieces) {
         long pawnAttacks;
         if (side.equals(Side.WHITE)) { //Tämän saa ? avulla nätisti
             pawnAttacks = whitePawnAttacks[square.ordinal()] & enemyPieces;
@@ -216,10 +245,10 @@ public class BitOperations {
 
     /**
      * Goes through all the directions (NE,SW,NW,SE) and uses masks and
-     * forward/reverse scan to figure calculate bishops possible attack squares.
+     * forward/reverse scan to figure out bishops possible attack squares.
      *
-     * @param square
-     * @param occupied
+     * @param square square of the bishop
+     * @param occupied bitboard representing occupied squares
      * @return
      */
     public static long getBishopMoves(Square square, long occupied) {
@@ -245,24 +274,23 @@ public class BitOperations {
     }
 
     /**
-     * Need to clean up a little Calculates the diagonals from the defined
+     * Need to clean up a little | Calculates the diagonals from the defined
      * square. Handles NE and SW rays. (North-East, South-West) Used for
      * generating a pre-calculated array for the bishops 'rays'.
      *
-     * @param square
-     * @param way
+     * @param square of the bishop
+     * @param way (expected values: (NE | SW))
      * @return
      */
-    public static long getBishopRaysNESW(Square square, String way) {
+    public static long getBishopRaysNESW(long square, String way) {
         long bishopAttacks = 0L;
         long nextSquare;
-        Square tempSquare = square;
 
-        while (!((way.equals("NE")) ? tempSquare.getFile().equals(File.FILE_H) | tempSquare.getRank().equals(Rank.RANK_8) : tempSquare.getFile().equals(File.FILE_A) | tempSquare.getRank().equals(Rank.RANK_1))) {
-            nextSquare = (way.equals("NE")) ? tempSquare.getBitboard() << 9 : tempSquare.getBitboard() >> 9;
+        while ((way.equals("NE")) ? (square & (file[7] | rank[7])) == 0 : (square & (file[0] | rank[0])) == 0) {
+            nextSquare = (way.equals("NE")) ? square << 9 : square >> 9;
             bishopAttacks |= nextSquare;
 
-            tempSquare = Square.squareAt(bitScanForward(nextSquare));
+            square = nextSquare;
         }
         return bishopAttacks;
 
@@ -273,20 +301,19 @@ public class BitOperations {
      * (South-East, North-West). Used for generating a pre-calculated array for
      * the bishops 'rays'.
      *
-     * @param square
-     * @param way
+     * @param square of the bishop
+     * @param way (expected values: (NW | SE))
      * @return
      */
-    public static long getBishopRaysSENW(Square square, String way) {
+    public static long getBishopRaysSENW(long square, String way) {
         long bishopAttacks = 0L;
         long nextSquare;
-        Square tempSquare = square;
 
-        while (!((way.equals("NW")) ? tempSquare.getFile().equals(File.FILE_A) | tempSquare.getRank().equals(Rank.RANK_8) : tempSquare.getFile().equals(File.FILE_H) | tempSquare.getRank().equals(Rank.RANK_1))) {
-            nextSquare = (way.equals("NW")) ? tempSquare.getBitboard() << 7 : tempSquare.getBitboard() >> 7;
+        while ((way.equals("NW")) ? (square & (file[0] | rank[7])) == 0 : (square & (file[7] | rank[0])) == 0) {
+            nextSquare = (way.equals("NW")) ? square << 7 : square >> 7;
             bishopAttacks |= nextSquare;
 
-            tempSquare = Square.squareAt(bitScanForward(nextSquare));
+            square = nextSquare;
         }
         return bishopAttacks;
     }
@@ -294,64 +321,83 @@ public class BitOperations {
     /**
      * Needs rework.
      *
-     * @param square
-     * @param occupied
+     * @param square of the rook
+     * @param occupied - bitboard representation of occupied squares
      * @return
      */
     public static long getRookMoves(Square square, long occupied) {
-
-        long rookAttacks = getRookFileAttacks(square, occupied, "RIGHT")
-                | getRookFileAttacks(square, occupied, "LEFT")
-                | getRookRankAttacks(square, occupied, "UP")
-                | getRookRankAttacks(square, occupied, "DOWN");
-
-        return rookAttacks;
-    }
-
-    public static long getRookFileAttacks(Square square, long occupied, String way) {
         long rookAttacks = 0L;
-        long nextSquare;
-        Square tempSquare = square;
+        int occupierIndex;
+        for (int i = 0; i < 4; i++) {
+            rookAttacks |= rookRays[i][square.ordinal()];
+            if ((rookRays[i][square.ordinal()] & occupied) != 0L) {
+                if (i < 2) {
+                    occupierIndex = bitScanForward((rookRays[i][square.ordinal()] & occupied));
+                } else {
+                    occupierIndex = bitScanReverse((rookRays[i][square.ordinal()] & occupied));
+                }
+                rookAttacks &= ~rookRays[i][occupierIndex];
 
-        File borderFile = (way.equals("RIGHT")) ? File.FILE_H : File.FILE_A;
-
-        while (!tempSquare.getFile().equals(borderFile)) {
-            nextSquare = (borderFile.equals(File.FILE_H)) ? tempSquare.getBitboard() << 1 : tempSquare.getBitboard() >> 1;
-            long nextPiece = nextSquare & occupied;
-            if (nextPiece != 0L) {
-                rookAttacks |= nextSquare;
-                break;
             }
-            rookAttacks |= nextSquare;
-
-            tempSquare = Square.squareAt(bitScanForward(nextSquare));
         }
         return rookAttacks;
 
     }
 
-    public static long getRookRankAttacks(Square square, long occupied, String way) {
-        long rookAttacks = 0L;
+    /**
+     * Utility function to generate rook rays in each square.
+     *
+     * @param square of the rook
+     * @param way (expected values: (E | W))
+     * @return East or West rays
+     */
+    public static long getRookRankRays(long square, String way) {
+        long rays = 0L;
         long nextSquare;
-        Square tempSquare = square;
 
-        Rank borderRank = (way.equals("UP")) ? Rank.RANK_8 : Rank.RANK_1;
+        long borderFile = (way.equals("EAST")) ? file[7] : file[0];
 
-        while (!tempSquare.getRank().equals(borderRank)) {
-            nextSquare = (borderRank.equals(Rank.RANK_8)) ? tempSquare.getBitboard() << 8 : tempSquare.getBitboard() >> 8;
-            long nextPiece = nextSquare & occupied;
-            if (nextPiece != 0L) {
-                rookAttacks |= nextSquare;
-                break;
-            }
-            rookAttacks |= nextSquare;
+        while ((square & borderFile) == 0) {
+            nextSquare = (way.equals("EAST")) ? square << 1 : square >> 1;
+            rays |= nextSquare;
 
-            tempSquare = Square.squareAt(bitScanForward(nextSquare));
+            square = nextSquare;
         }
-        return rookAttacks;
+        return rays;
 
     }
 
+    /**
+     * Utility function to generate rook rays in each square.
+     *
+     * @param square of the rook
+     * @param way (expected values: (N | S))
+     * @return North or South rays
+     */
+    public static long getRookFileRays(long square, String way) {
+        long rays = 0L;
+        long nextSquare;
+
+        long borderRank = (way.equals("NORTH")) ? rank[7] : rank[0];
+
+        while ((square & borderRank) == 0) {
+            nextSquare = (way.equals("NORTH")) ? square << 8 : square >> 8;
+            rays |= nextSquare;
+
+            square = nextSquare;
+        }
+        return rays;
+
+    }
+
+    /**
+     * Same logic as knight: an AND operation between kings possible moves
+     * (=adjacent squares to king) and own pieces.
+     *
+     * @param square of the king
+     * @param ownPieces bitboard representation of own pieces
+     * @return kings pseudolegal moves as bitboard
+     */
     public static long getKingMoves(Square square, long ownPieces) {
         return adjacentSquares[square.ordinal()] & ~ownPieces;
     }
