@@ -22,14 +22,14 @@ public class MovesGenerator {
         ArrayList<Move> legalMoves = new ArrayList<>();
         long ownPieces = b.getBitboard(b.getSideToMove());
 
-        generateKnightMoves(b, legalMoves, ~ownPieces);
+        generateKnightMoves(b, legalMoves, ownPieces);
         generatePawnMoves(b, legalMoves);
         generatePawnCaptures(b, legalMoves);
         generateRookMoves(b, legalMoves);
         generateBishopMoves(b, legalMoves);
+        generateQueenMoves(b, legalMoves);
         generateKingMoves(b, legalMoves, ownPieces);
 
-        //Here rest of 'generate' methods
         for (Iterator<Move> iterator = legalMoves.iterator(); iterator.hasNext();) {
             Move move = iterator.next();
             if (!isMoveLegal(move, b)) {

@@ -1,6 +1,5 @@
 package datastructureproject;
 
-import com.github.bhlangonijr.chesslib.File;
 import com.github.bhlangonijr.chesslib.Rank;
 import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
@@ -49,20 +48,20 @@ public class BitOperations {
             current = Square.squareAt(x);
             currentBB = current.getBitboard();
 
-            whitePawnAttacks[x] |= ((currentBB & 0x7f7f7f7f7f7f7fL) << 9)
-                    | ((currentBB & 0xfefefefefefefeL) << 7);
+            whitePawnAttacks[x] |= ((currentBB & ~(rank[7] | file[7])) << 9)
+                    | ((currentBB & ~(rank[7] | file[0])) << 7);
 
-            whitePawnMoves[x] |= ((currentBB & 0xffffffffffffffL) << 8)
-                    | ((currentBB & 0xff00L) << 16);
+            whitePawnMoves[x] |= ((currentBB & ~rank[7]) << 8)
+                    | ((currentBB & rank[1]) << 16);
 
-            blackPawnAttacks[x] |= ((currentBB & 0xfefefefefefefe00L) >> 9)
-                    | ((currentBB & 0x7f7f7f7f7f7f7f00L) >> 7);
+            blackPawnAttacks[x] |= ((currentBB & ~(rank[0] | file[0])) >> 9)
+                    | ((currentBB & ~(rank[0] | file[7])) >> 7);
 
-            blackPawnMoves[x] |= ((currentBB & 0xffffffffffffff00L) >> 8)
-                    | ((currentBB & 0xff000000000000L) >> 16);
+            blackPawnMoves[x] |= ((currentBB & ~rank[0]) >> 8)
+                    | ((currentBB & rank[6]) >> 16);
         }
         blackPawnAttacks[63] = 0x0040000000000000L;
-        blackPawnMoves[63] = 0x0080000000000000L; //bug again 
+        blackPawnMoves[63] = 0x0080000000000000L;   //sq 64 weirdness 
     }
 
     /**
@@ -75,15 +74,15 @@ public class BitOperations {
         for (int x = 0; x <= 62; x++) {
             attacks = 0L;
             current = Square.squareAt(x);
-            currentBB = current.getBitboard();                   //Masks:
-            attacks |= ((currentBB & 0x00007F7F7F7F7F7FL) << 17) //All but ranks 7,8 and file H
-                    | ((currentBB & 0x003F3F3F3F3F3F3FL) << 10) //All but rank 8 and files G,H
-                    | ((currentBB & 0x3F3F3F3F3F3F3F00L) >> 6) //ETC.
-                    | ((currentBB & 0x7F7F7F7F7F7F0000L) >> 15)
-                    | ((currentBB & 0x0000FEFEFEFEFEFEL) << 15)
-                    | ((currentBB & 0x00FCFCFCFCFCFCFCL) << 6)
-                    | ((currentBB & 0xFCFCFCFCFCFCFC00L) >> 10)
-                    | ((currentBB & 0xFEFEFEFEFEFE0000L) >> 17);
+            currentBB = current.getBitboard();                              //Masks:
+            attacks |= ((currentBB & ~(rank[6] | rank[7] | file[7])) << 17) //All but ranks 7,8 and file H
+                    | ((currentBB & ~(rank[7] | file[6] | file[7])) << 10) //All but rank 8 and files G,H
+                    | ((currentBB & ~(rank[0] | file[6] | file[7])) >> 6) //ETC.
+                    | ((currentBB & ~(rank[0] | rank[1] | file[7])) >> 15)
+                    | ((currentBB & ~(rank[6] | rank[7] | file[0])) << 15)
+                    | ((currentBB & ~(rank[7] | file[0] | file[1])) << 6)
+                    | ((currentBB & ~(rank[0] | file[0] | file[1])) >> 10)
+                    | ((currentBB & ~(rank[0] | rank[1] | file[0])) >> 17);
 
             knightAttacks[x] = attacks;
 
@@ -103,18 +102,18 @@ public class BitOperations {
             current = Square.squareAt(x);
             currentBB = current.getBitboard();
 
-            attacks |= ((currentBB & 0xffffffffffffff00L) >> 8)
-                    | ((currentBB & 0xffffffffffffffL) << 8)
-                    | ((currentBB & 0xfefefefefefefefeL) >> 1)
-                    | ((currentBB & 0x7f7f7f7f7f7f7f7fL) << 1)
-                    | ((currentBB & 0xfefefefefefefe00L) >> 9)
-                    | ((currentBB & 0x7f7f7f7f7f7f7fL) << 9)
-                    | ((currentBB & 0x7f7f7f7f7f7f7f00L) >> 7)
-                    | ((currentBB & 0xfefefefefefefeL) << 7);
+            attacks |= ((currentBB & ~rank[0]) >> 8)
+                    | ((currentBB & ~rank[7]) << 8)
+                    | ((currentBB & ~file[0]) >> 1)
+                    | ((currentBB & ~file[7]) << 1)
+                    | ((currentBB & ~(rank[0] | file[0])) >> 9)
+                    | ((currentBB & ~(rank[7] | file[7])) << 9)
+                    | ((currentBB & ~(rank[0] | file[7])) >> 7)
+                    | ((currentBB & ~(rank[7] | file[0])) << 7);
 
             adjacentSquares[x] = attacks;
         }
-        adjacentSquares[63] = 0x40c0000000000000L;
+        adjacentSquares[63] = 0x40c0000000000000L; //something weird with square 64 ..
     }
 
     /**
@@ -183,7 +182,7 @@ public class BitOperations {
     }
 
     public static long getKnightMoves(Square square, long ownPieces) {
-        return knightAttacks[square.ordinal()] & ownPieces;
+        return knightAttacks[square.ordinal()] & ~ownPieces;
     }
 
     /**

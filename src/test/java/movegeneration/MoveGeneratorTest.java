@@ -74,16 +74,39 @@ public class MoveGeneratorTest {
 
     @Test
     public void knightDoesntDoFriendlyFire() {
-        b.setPiece(Piece.WHITE_PAWN, Square.A3);
-        b.setPiece(Piece.WHITE_PAWN, Square.C3);
+        b.clear();
+        b.setPiece(Piece.WHITE_KNIGHT, Square.D4);
+        b.setPiece(Piece.WHITE_PAWN, Square.C2);
+        b.setPiece(Piece.WHITE_PAWN, Square.C6);
+        b.setPiece(Piece.WHITE_PAWN, Square.E2);
+        b.setPiece(Piece.WHITE_PAWN, Square.E6);
+        b.setPiece(Piece.WHITE_PAWN, Square.B3);
+        b.setPiece(Piece.WHITE_PAWN, Square.B5);
         b.setPiece(Piece.WHITE_PAWN, Square.F3);
-        b.setPiece(Piece.WHITE_PAWN, Square.H3);
+        b.setPiece(Piece.WHITE_PAWN, Square.F5);
         knightMoves();
+        System.out.println(moves);
         assertEquals(0, moves.size());
     }
 
+    @Test
+    public void knightSurroundedByEnemies() {
+        b.clear();
+        b.setPiece(Piece.WHITE_KNIGHT, Square.D4);
+        b.setPiece(Piece.BLACK_PAWN, Square.C2);
+        b.setPiece(Piece.BLACK_PAWN, Square.C6);
+        b.setPiece(Piece.BLACK_PAWN, Square.E2);
+        b.setPiece(Piece.BLACK_PAWN, Square.E6);
+        b.setPiece(Piece.BLACK_PAWN, Square.B3);
+        b.setPiece(Piece.BLACK_PAWN, Square.B5);
+        b.setPiece(Piece.BLACK_PAWN, Square.F3);
+        b.setPiece(Piece.BLACK_PAWN, Square.F5);
+        knightMoves();
+        assertEquals(8, moves.size());
+    }
+
     public void knightMoves() {
-        gen.generateKnightMoves(b, moves, ~b.getBitboard(b.getSideToMove()));
+        gen.generateKnightMoves(b, moves, b.getBitboard(b.getSideToMove()));
     }
 
     //PAWN
@@ -235,10 +258,10 @@ public class MoveGeneratorTest {
         b.setPiece(Piece.BLACK_KNIGHT, Square.C1);
         b.setPiece(Piece.BLACK_KNIGHT, Square.C3);
         gen.generateBishopMoves(b, moves);
-        System.out.println(moves);
-        
+
         assertEquals(4, moves.size());
     }
+
     @Test
     public void bishopBlockedByEnemiesFurther() {
         b.clear();
@@ -248,10 +271,10 @@ public class MoveGeneratorTest {
         b.setPiece(Piece.BLACK_KNIGHT, Square.G7);
         b.setPiece(Piece.BLACK_KNIGHT, Square.B4);
         gen.generateBishopMoves(b, moves);
-        
-        System.out.println(moves);
+
         assertEquals(9, moves.size());
     }
+
     @Test
     public void bishopBlockedByFriends() {
         b.clear();
@@ -261,11 +284,10 @@ public class MoveGeneratorTest {
         b.setPiece(Piece.WHITE_KING, Square.C1);
         b.setPiece(Piece.WHITE_PAWN, Square.C3);
         gen.generateBishopMoves(b, moves);
-        
+
         assertEquals(0, moves.size());
     }
 
-    
     //KING
     @Test
     public void kingMovesAtStart() {

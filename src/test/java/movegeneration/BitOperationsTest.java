@@ -144,20 +144,7 @@ public class BitOperationsTest {
     @Test
     public void rookRays() {
         
-        System.out.println(BitOperations.getRookRays()[0][0]);
-        System.out.println(BitOperations.getRookRays()[1][0]);
-        System.out.println(BitOperations.getRookRays()[2][0]);
-        System.out.println(BitOperations.getRookRays()[3][0]);
         
-        System.out.println(BitOperations.getBishopRays()[0][0]);
-        System.out.println(BitOperations.getBishopRays()[1][0]);
-        System.out.println(BitOperations.getBishopRays()[2][0]);
-        System.out.println(BitOperations.getBishopRays()[3][0]);
-        
-    /*    System.out.println(BitOperations.getRookFileRays(Square.H1, "NORTH"));
-        System.out.println(BitOperations.getRookFileRays(Square.H1, "SOUTH"));
-        System.out.println(BitOperations.getRookRankRays(Square.H1, "EAST"));
-        System.out.println(BitOperations.getRookRankRays(Square.H1, "WEST"));*/
     }
 
     @Test
