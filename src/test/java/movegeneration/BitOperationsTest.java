@@ -6,13 +6,19 @@
 package movegeneration;
 
 import com.github.bhlangonijr.chesslib.Board;
+import com.github.bhlangonijr.chesslib.Piece;
+import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
+import com.github.bhlangonijr.chesslib.move.Move;
 import datastructureproject.*;
 import datastructureproject.BitOperations;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -112,6 +118,7 @@ public class BitOperationsTest {
     @Before
     public void setUp() {
         moves.clear();
+        b = new Board();
     }
 
     @After
@@ -141,10 +148,19 @@ public class BitOperationsTest {
 
     }
 
-    @Test
+    //@Test
     public void rookRays() {
-        
-        
+        /*
+        System.out.println(BitOperations.getBishopRays()[0][63]);
+        System.out.println(BitOperations.getBishopRays()[1][63]);
+        System.out.println(BitOperations.getBishopRays()[2][63]);
+        System.out.println(BitOperations.getBishopRays()[3][63]);
+         
+        System.out.println(BitOperations.getRookRays()[0][63]);
+        System.out.println(BitOperations.getRookRays()[1][63]);
+        System.out.println(BitOperations.getRookRays()[2][63]);
+        System.out.println(BitOperations.getRookRays()[3][63]);
+         */
     }
 
     @Test
@@ -158,6 +174,77 @@ public class BitOperationsTest {
             assertEquals(whitePawnAttacks[x], wPawnAttacks[x]);
             assertEquals(blackPawnMoves[x], bPawnMoves[x]);
             assertEquals(blackPawnAttacks[x], bPawnAttacks[x]);
+        }
+    }
+
+    @Test
+    public void squareAttackedByNothing() {
+        long attacks = BitOperations.squareAttackedBy(Side.BLACK, b, Square.E1);
+        assertEquals(attacks, 0L);
+    }
+
+    /**
+     * The white king is attacked by every black piece on the board.
+     */
+    @Test
+    public void squareAttackedByEverything() {
+        b.clear();
+        b.setPiece(Piece.WHITE_KING, Square.E4);
+        b.setPiece(Piece.BLACK_KING, Square.E5);
+        b.setPiece(Piece.BLACK_BISHOP, Square.C6);
+        b.setPiece(Piece.BLACK_ROOK, Square.E2);
+        b.setPiece(Piece.BLACK_QUEEN, Square.G2);
+        b.setPiece(Piece.BLACK_PAWN, Square.F5);
+        b.setPiece(Piece.BLACK_KNIGHT, Square.G5);
+        long attacks = BitOperations.squareAttackedBy(Side.BLACK, b, Square.E4);
+        assertEquals(0x47000005000L, attacks);
+    }
+
+    //TESTS FOR FILTERING PSEUDOLEGAL MOVES
+    public void boardForCheckTesting() {
+        b.clear();
+        b.setPiece(Piece.WHITE_KING, Square.C3);
+        b.setPiece(Piece.WHITE_PAWN, Square.E3);
+        b.setPiece(Piece.BLACK_ROOK, Square.B4);
+        b.setPiece(Piece.BLACK_PAWN, Square.D5);
+        b.setPiece(Piece.BLACK_KNIGHT, Square.D4);
+        b.setPiece(Piece.BLACK_QUEEN, Square.F3);
+        b.setSideToMove(Side.WHITE);
+    }
+
+    /**
+     * This is supposed to be used with specific setup of boardForCheckTesting.
+     */
+    public void setMovesList() {
+        //ILLEGAL MOVES
+        moves.add(new Move(Square.C3, Square.B3));    //Rook+Knight check
+        moves.add(new Move(Square.C3, Square.B2));    //Rook check
+        moves.add(new Move(Square.C3, Square.C4));    //Rook+Pawn check
+        moves.add(new Move(Square.C3, Square.C2));    //Knight check
+        moves.add(new Move(Square.C3, Square.D4));    //Rook check
+        moves.add(new Move(Square.E3, Square.E4));    //Queen discover check
+        
+        //LEGAL MOVES
+        moves.add(new Move(Square.C3, Square.B4));    //Legal rook capture
+        moves.add(new Move(Square.C3, Square.D2));    //Legal move
+    }
+    
+    @Test
+    public void isMoveLegal() {
+        boardForCheckTesting();
+        setMovesList();
+        moves.forEach((move) -> {
+            assertMoveIsLegal(move, b);
+        });
+    }
+
+    
+    public static void assertMoveIsLegal(Move move, Board b) {
+        try {
+            assertEquals(b.isMoveLegal(move, true), BitOperations.isMoveLegal(move, b));
+        } catch (AssertionError e) {
+            System.out.println(move.toString() + " - failed");
+            throw e;
         }
     }
 

@@ -1,8 +1,14 @@
 package datastructureproject;
 
+import com.github.bhlangonijr.chesslib.Board;
+import com.github.bhlangonijr.chesslib.Piece;
+import com.github.bhlangonijr.chesslib.PieceType;
 import com.github.bhlangonijr.chesslib.Rank;
+import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides some bitboard operations to solve the possible moves.
@@ -87,7 +93,7 @@ public class BitOperations {
             knightAttacks[x] = attacks;
 
         }
-        knightAttacks[63] = 0x0020400000000000L; //Weird bug (had to hardcode this)
+        knightAttacks[63] = 0x0020400000000000L;
     }
 
     /**
@@ -122,7 +128,7 @@ public class BitOperations {
      */
     static {
         long current;
-        for (int x = 0; x <= 63; x++) {
+        for (int x = 0; x <= 62; x++) {
 
             current = Square.squareAt(x).getBitboard();
 
@@ -131,6 +137,10 @@ public class BitOperations {
             bishopRays[2][x] = getBishopRaysSENW(current, "SE");
             bishopRays[3][x] = getBishopRaysNESW(current, "SW");
         }
+        bishopRays[0][63] = 0L;
+        bishopRays[1][63] = 0L;
+        bishopRays[2][63] = 0L;
+        bishopRays[3][63] = 0x40201008040201L;
     }
 
     /**
@@ -139,7 +149,7 @@ public class BitOperations {
      */
     static {
         long current;
-        for (int x = 0; x <= 63; x++) {
+        for (int x = 0; x <= 62; x++) {
 
             current = Square.squareAt(x).getBitboard();
             rookRays[0][x] = getRookFileRays(current, "NORTH");
@@ -147,6 +157,11 @@ public class BitOperations {
             rookRays[2][x] = getRookFileRays(current, "SOUTH");
             rookRays[3][x] = getRookRankRays(current, "WEST");
         }
+
+        rookRays[0][63] = 0L;
+        rookRays[1][63] = 0L;
+        rookRays[2][63] = 0x80808080808080L;
+        rookRays[3][63] = 0x7f00000000000000L;
     }
 
     public static long[] getKnightAttacks() {
@@ -179,6 +194,10 @@ public class BitOperations {
 
     public static long[] getWhitePawnAttacks() {
         return whitePawnAttacks;
+    }
+
+    public static long[] getPawnAttacks(Side side) {
+        return (String.valueOf(side).equals("WHITE")) ? whitePawnAttacks : blackPawnAttacks;
     }
 
     public static long getKnightMoves(Square square, long ownPieces) {
@@ -399,6 +418,122 @@ public class BitOperations {
      */
     public static long getKingMoves(Square square, long ownPieces) {
         return adjacentSquares[square.ordinal()] & ~ownPieces;
+    }
+
+    public static Square getKingSquare(Board b, Side side) {
+        long king = b.getBitboard(Piece.make(side, PieceType.KING));
+        int kingIndex = bitScanForward(king);
+        return Square.squareAt(kingIndex);
+    }
+
+    /**
+     * Checks for all possible attacks to a square from the enemy pieces. First,
+     * from the kings point of view, checks for pawn attacks (close diagonals)
+     * for enemy pawns with an AND operation. If no enemy pawns detected, then
+     * 'attacks' stays 0L. Logic is same with all other pieces.
+     *
+     * @param enemySide - white or black
+     * @param b - current board (can be in illegal state)
+     * @param square - current square
+     * @return
+     */
+    public static long squareAttackedBy(Side enemySide, Board b, Square square) {
+        long attacks = 0L;
+        attacks |= (BitOperations.getPawnAttacks(enemySide.flip())[square.ordinal()]
+                & b.getBitboard(Piece.make(enemySide, PieceType.PAWN)));
+        attacks |= (BitOperations.getKnightAttacks()[square.ordinal()]
+                & b.getBitboard(Piece.make(enemySide, PieceType.KNIGHT)));
+        attacks |= (BitOperations.getAdjacentSquares()[square.ordinal()]
+                & b.getBitboard(Piece.make(enemySide, PieceType.KING)));
+        attacks |= (BitOperations.getBishopMoves(square, b.getBitboard())
+                & (b.getBitboard(Piece.make(enemySide, PieceType.BISHOP))
+                | b.getBitboard(Piece.make(enemySide, PieceType.QUEEN))));
+        attacks |= (BitOperations.getRookMoves(square, b.getBitboard())
+                & (b.getBitboard(Piece.make(enemySide, PieceType.ROOK))
+                | b.getBitboard(Piece.make(enemySide, PieceType.QUEEN))));
+
+        return attacks;
+    }
+
+    /**
+     * Used for realizing a move on a temporary board to find out if it is legal
+     * or not.
+     *
+     * @param move
+     * @param b
+     */
+    public static void pseudoMove(Move move, Board b) {
+        Square from = move.getFrom();
+        Square to = move.getTo();
+        if (!b.getPiece(to).value().equals("NONE")) {
+            b.unsetPiece(b.getPiece(to), to);
+        }
+        b.setPiece(b.getPiece(from), to);
+        b.unsetPiece(b.getPiece(from), from);
+
+    }
+
+    public static boolean isMoveLegal(Move move, Board b) {
+        Board tempBoard = b.clone();
+
+        pseudoMove(move, tempBoard);
+        Square kingSquare = getKingSquare(tempBoard, tempBoard.getSideToMove());
+        boolean isKingMove = (move.getTo() == kingSquare);
+
+        return !BitOperations.isKingChecked(tempBoard, kingSquare, isKingMove);
+    }
+
+    public static boolean isCheckMate(Board b) {
+        MovesGenerator generator = new MovesGenerator();
+        return generator.GenerateLegalMoves(b).isEmpty() && isKingAttacked(b);
+    }
+
+    public static boolean isKingAttacked(Board b) {
+        return squareAttackedBy(b.getSideToMove().flip(), b, getKingSquare(b, b.getSideToMove())) != 0;
+    }
+
+    /**
+     * If the king moved, then checks for all threats. Otherwise checks only for
+     * file and diagonal attacks between the king and enemy
+     * rooks/bishops/queens.
+     *
+     * @param b - current board
+     * @param square - kings square
+     * @param isKingMove - true if current move is a king move.
+     * @return
+     */
+    public static boolean isKingChecked(Board b, Square square, boolean isKingMove) {
+
+        Side enemySide = b.getSideToMove().flip();
+        long allPieces = b.getBitboard();
+
+        long enemyRooks = b.getBitboard(Piece.make(enemySide, PieceType.ROOK));
+        long enemyBishops = b.getBitboard(Piece.make(enemySide, PieceType.BISHOP));
+        long enemyQueens = b.getBitboard(Piece.make(enemySide, PieceType.QUEEN));
+
+        /*
+        if (isKingMove) {
+            if (squareAttackedBy(enemySide, b, square) != 0) {
+                return true;
+            }
+        }*/
+        if (isKingAttacked(b)) {
+            return true;
+        }
+
+        /*
+        if ((enemyRooks & getRookMoves(square, allPieces)) != 0L) {  //Open file/rank between rook and king
+            return true;
+        }
+
+        if ((enemyBishops & getBishopMoves(square, allPieces)) != 0L) {  //Open diagonal between bishop and king
+            return true;
+        }
+
+        if ((enemyQueens & getQueenMoves(square, allPieces)) != 0L) {  //Open file/rank/diagonal between queen and king
+            return true;
+        }*/
+        return false;
     }
 
     /**

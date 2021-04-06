@@ -1,6 +1,7 @@
 
 package datastructureproject;
 
+import datastructureproject.Evaluation.BoardEvaluation;
 import chess.bot.ChessBot;
 import chess.engine.GameState;
 import com.github.bhlangonijr.chesslib.move.Move;
@@ -12,6 +13,7 @@ import java.util.Random;
 
 import com.github.bhlangonijr.chesslib.*;
 import java.util.ArrayList;
+import java.util.List;
     
 
 /**
@@ -22,12 +24,13 @@ public class TemporaryBot implements ChessBot {
     private Random random; 
     private Board b;
     private MovesGenerator moveGenerator;
+    private BoardEvaluation evaluater;
     
     public TemporaryBot() {
         this.random = new Random();
         this.b = new Board();
         moveGenerator = new MovesGenerator();
-        
+        evaluater = null; 
     }
     
     /**
@@ -67,11 +70,23 @@ public class TemporaryBot implements ChessBot {
         
         //Returns null if no legal moves available, else returns a randomly selected legal move.
         if (moves.size() > 0) {
+            //Here MiniMax
             return moves.get(random.nextInt(moves.size()));
         } else {
             return null;
         }
     }
+    
+    public Move miniMaxAlgorithm(List<Move> moves) {
+        //Eval best move = loop through moves, get highest scoring
+        //First move(depth of 2):
+        //1. do the move
+        //2. 
+        
+        
+        return null;
+    }
+     
 
     public Board getBoard() {
         return this.b;

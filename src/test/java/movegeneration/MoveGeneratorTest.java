@@ -7,6 +7,8 @@ package movegeneration;
 
 import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.Piece;
+import com.github.bhlangonijr.chesslib.PieceType;
+import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
 import datastructureproject.BitOperations;
@@ -85,7 +87,6 @@ public class MoveGeneratorTest {
         b.setPiece(Piece.WHITE_PAWN, Square.F3);
         b.setPiece(Piece.WHITE_PAWN, Square.F5);
         knightMoves();
-        System.out.println(moves);
         assertEquals(0, moves.size());
     }
 
@@ -174,6 +175,57 @@ public class MoveGeneratorTest {
         gen.generatePawnCaptures(b, moves);
     }
 
+    @Test
+    public void whitePawnCanPromoteByMoving() {
+        b.clear();
+        b.setPiece(Piece.WHITE_PAWN, Square.A7);
+        pawnMoves();
+
+        assertEquals(4, moves.size());
+        assertThatPromotionMovesAvailable("WHITE");
+    }
+
+    @Test
+    public void whitePawnCanPromoteByCapturing() {
+        b.clear();
+        b.setPiece(Piece.WHITE_PAWN, Square.A7);
+        b.setPiece(Piece.BLACK_QUEEN, Square.B8);
+        pawnCaptures();
+
+        assertThatPromotionMovesAvailable("WHITE");
+    }
+
+    @Test
+    public void blackPawnCanPromoteByMoving() {
+        b.clear();
+        b.setSideToMove(Side.BLACK);
+        b.setPiece(Piece.BLACK_PAWN, Square.A2);
+        pawnMoves();
+
+        assertThatPromotionMovesAvailable("BLACK");
+    }
+
+    @Test
+    public void blackPawnCanPromoteByCapturing() {
+        b.clear();
+        b.setSideToMove(Side.BLACK);
+
+        b.setPiece(Piece.BLACK_PAWN, Square.A2);
+        b.setPiece(Piece.WHITE_QUEEN, Square.B1);
+        pawnCaptures();
+
+        assertThatPromotionMovesAvailable("BLACK");
+    }
+
+    public void assertThatPromotionMovesAvailable(String side) {
+        for (Move move : moves) {
+            assertTrue(move.getPromotion().equals(Piece.make(Side.fromValue(side), PieceType.fromValue("KNIGHT")))
+                    | move.getPromotion().equals(Piece.make(Side.fromValue(side), PieceType.fromValue("ROOK")))
+                    | move.getPromotion().equals(Piece.make(Side.fromValue(side), PieceType.fromValue("BISHOP")))
+                    | move.getPromotion().equals(Piece.make(Side.fromValue(side), PieceType.fromValue("QUEEN"))));
+        }
+    }
+
     //ROOK
     @Test
     public void rookMovesEmptyBoard() {
@@ -185,7 +237,7 @@ public class MoveGeneratorTest {
     }
 
     @Test
-    public void rookMovesWhenBlockedByFriends() {
+    public void rookMovesBlockedByFriends() {
         b.clear();
         b.setPiece(Piece.WHITE_ROOK, Square.A1);
         b.setPiece(Piece.WHITE_PAWN, Square.A2);
@@ -207,7 +259,7 @@ public class MoveGeneratorTest {
     }
 
     @Test
-    public void rookMovesWhenEnemyIsFurther() {
+    public void rookMovesEnemyTwoBlocksAway() {
         b.clear();
         b.setPiece(Piece.WHITE_ROOK, Square.A1);
         b.setPiece(Piece.WHITE_PAWN, Square.A2);
@@ -218,7 +270,7 @@ public class MoveGeneratorTest {
     }
 
     @Test
-    public void rookMovesWhenSurroundedByEnemies() {
+    public void rookMovesSurroundedByEnemies() {
         b.clear();
         b.setPiece(Piece.WHITE_ROOK, Square.C3);
         b.setPiece(Piece.BLACK_PAWN, Square.C2);
@@ -314,4 +366,27 @@ public class MoveGeneratorTest {
         assertEquals(8, moves.size());
     }
 
+    //QUEEN - essentially just combines rook and bishop, no need for indepth testing
+    @Test
+    public void queenMovesStart() {
+        gen.generateQueenMoves(b, moves);
+        assertEquals(0, moves.size());
+    }
+
+    @Test
+    public void queenMovesEmptyBoard() {
+        b.clear();
+        b.setPiece(Piece.WHITE_QUEEN, Square.E5);
+        gen.generateQueenMoves(b, moves);
+        assertEquals(27, moves.size());
+    }
+
+    //RANDOM
+    
+    public void generatingMovesIsNotTooSlow() {
+        long startTime = System.currentTimeMillis();
+        gen.GenerateLegalMoves(b);
+        System.out.println("moveGen took: " + (System.currentTimeMillis() - startTime));
+        
+    }
 }

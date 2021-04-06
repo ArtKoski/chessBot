@@ -1,8 +1,10 @@
 package datastructureproject;
 
 import com.github.bhlangonijr.chesslib.Board;
+import com.github.bhlangonijr.chesslib.CastleRight;
 import com.github.bhlangonijr.chesslib.Piece;
 import com.github.bhlangonijr.chesslib.PieceType;
+import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
 import java.util.ArrayList;
@@ -19,38 +21,28 @@ public class MovesGenerator {
 
     public ArrayList<Move> GenerateLegalMoves(Board b) {
         bitboard = new BitOperations();
-        ArrayList<Move> legalMoves = new ArrayList<>();
+        ArrayList<Move> moves = new ArrayList<>();
         long ownPieces = b.getBitboard(b.getSideToMove());
 
-        generateKnightMoves(b, legalMoves, ownPieces);
-        generatePawnMoves(b, legalMoves);
-        generatePawnCaptures(b, legalMoves);
-        generateRookMoves(b, legalMoves);
-        generateBishopMoves(b, legalMoves);
-        generateQueenMoves(b, legalMoves);
-        generateKingMoves(b, legalMoves, ownPieces);
+        generateKnightMoves(b, moves, ownPieces);
+        generatePawnMoves(b, moves);
+        generatePawnCaptures(b, moves);
+        generateRookMoves(b, moves);
+        generateBishopMoves(b, moves);
+        generateQueenMoves(b, moves);
+        generateKingMoves(b, moves, ownPieces);
+        //generateCastleMoves(b, moves);
 
-        for (Iterator<Move> iterator = legalMoves.iterator(); iterator.hasNext();) {
+        for (Iterator<Move> iterator = moves.iterator(); iterator.hasNext();) {
             Move move = iterator.next();
-            if (!isMoveLegal(move, b)) {
+            if (!BitOperations.isMoveLegal(move, b)) {
                 iterator.remove();
             }
         }
 
-        System.out.println("Moves found: " + legalMoves);
+        //System.out.println(b.getSideToMove() + " Moves found: " + moves);
 
-        return legalMoves;
-    }
-
-    public boolean isMoveLegal(Move move, Board b) {
-        Board tempBoard = b.clone();
-        tempBoard.doMove(move);
-        if (tempBoard.isKingAttacked()) {
-            return false;
-        }
-        tempBoard.undoMove();
-
-        return true;
+        return moves;
     }
 
     public void generateKnightMoves(Board b, List<Move> moveList, long ownPieces) {
@@ -89,6 +81,30 @@ public class MovesGenerator {
         }
     }
 
+    //COPY PASTA FROM CHESSLIB FOR TIME BEING == NOT OWN IMPLEMENTATION!!!
+    public void generateCastleMoves(Board board, List<Move> moves) {
+        Side side = board.getSideToMove();
+        if (board.isKingAttacked()) {
+            return;
+        }
+        if (board.getCastleRight(side).equals(CastleRight.KING_AND_QUEEN_SIDE)
+                || (board.getCastleRight(side).equals(CastleRight.KING_SIDE))) {
+            if ((board.getBitboard() & board.getContext().getooAllSquaresBb(side)) == 0L) {
+                if (!board.isSquareAttackedBy(board.getContext().getooSquares(side), side.flip())) {
+                    moves.add(board.getContext().getoo(side));
+                }
+            }
+        }
+        if (board.getCastleRight(side).equals(CastleRight.KING_AND_QUEEN_SIDE)
+                || (board.getCastleRight(side).equals(CastleRight.QUEEN_SIDE))) {
+            if ((board.getBitboard() & board.getContext().getoooAllSquaresBb(side)) == 0L) {
+                if (!board.isSquareAttackedBy(board.getContext().getoooSquares(side), side.flip())) {
+                    moves.add(board.getContext().getooo(side));
+                }
+            }
+        }
+    }
+
     public void generatePawnMoves(Board b, List<Move> moveList) {
         long pawns = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.PAWN));
 
@@ -100,9 +116,7 @@ public class MovesGenerator {
             while (moves != 0L) {
                 int targetIndex = BitOperations.bitScanForward(moves);
                 Square squareTarget = Square.squareAt(targetIndex);
-                Move newMove = new Move(squareCurrent, squareTarget, Piece.NONE);
-                moveList.add(newMove);
-
+                addPawnMoves(squareTarget, squareCurrent, b.getSideToMove(), moveList);
                 moves = BitOperations.removeLSB(moves);
             }
             pawns = BitOperations.removeLSB(pawns);
@@ -122,15 +136,31 @@ public class MovesGenerator {
             while (captures != 0L) {
                 int targetIndex = BitOperations.bitScanForward(captures);
                 Square squareTarget = Square.squareAt(targetIndex);
-                Move newMove = new Move(squareCurrent, squareTarget, Piece.NONE);
-                moveList.add(newMove);
-
+                addPawnMoves(squareTarget, squareCurrent, b.getSideToMove(), moveList);
                 captures = BitOperations.removeLSB(captures);
             }
 
             pawns = BitOperations.removeLSB(pawns);
         }
 
+    }
+
+    public void addPawnMoves(Square squareTarget, Square squareCurrent, Side side, List<Move> moves) {
+        long targetBB = squareTarget.getBitboard();
+        if (side.equals(Side.WHITE) && (targetBB & BitOperations.rank[7]) != 0L) {
+            moves.add(new Move(squareCurrent, squareTarget, Piece.WHITE_KNIGHT));
+            moves.add(new Move(squareCurrent, squareTarget, Piece.WHITE_ROOK));
+            moves.add(new Move(squareCurrent, squareTarget, Piece.WHITE_BISHOP));
+            moves.add(new Move(squareCurrent, squareTarget, Piece.WHITE_QUEEN));
+        } else if (side.equals(Side.BLACK) && (targetBB & BitOperations.rank[0]) != 0L) {
+            moves.add(new Move(squareCurrent, squareTarget, Piece.BLACK_KNIGHT));
+            moves.add(new Move(squareCurrent, squareTarget, Piece.BLACK_ROOK));
+            moves.add(new Move(squareCurrent, squareTarget, Piece.BLACK_BISHOP));
+            moves.add(new Move(squareCurrent, squareTarget, Piece.BLACK_QUEEN));
+        } else {
+            moves.add(new Move(squareCurrent, squareTarget, Piece.NONE));
+
+        }
     }
 
     public void generateRookMoves(Board b, List<Move> moveList) {
@@ -180,21 +210,24 @@ public class MovesGenerator {
     }
 
     public void generateQueenMoves(Board b, List<Move> moveList) {
-        long queen = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.BISHOP));
+        long queens = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.QUEEN));
 
-        int pieceIndex = BitOperations.bitScanForward(queen);
-        Square squareCurrent = Square.squareAt(pieceIndex);
-        
-        long bishopMovesPseudo = BitOperations.getQueenMoves(squareCurrent, b.getBitboard());
-        long moves = bishopMovesPseudo & ~b.getBitboard(b.getSideToMove());
+        while (queens != 0L) {
+            int pieceIndex = BitOperations.bitScanForward(queens);
+            Square squareCurrent = Square.squareAt(pieceIndex);
 
-        while (moves != 0L) {
-            int targetIndex = BitOperations.bitScanForward(moves);
-            Square squareTarget = Square.squareAt(targetIndex);
-            Move newMove = new Move(squareCurrent, squareTarget, Piece.NONE);
-            moveList.add(newMove);
+            long queenMovesPseudo = BitOperations.getQueenMoves(squareCurrent, b.getBitboard());
+            long moves = queenMovesPseudo & ~b.getBitboard(b.getSideToMove());
 
-            moves = BitOperations.removeLSB(moves);
+            while (moves != 0L) {
+                int targetIndex = BitOperations.bitScanForward(moves);
+                Square squareTarget = Square.squareAt(targetIndex);
+                Move newMove = new Move(squareCurrent, squareTarget, Piece.NONE);
+                moveList.add(newMove);
+
+                moves = BitOperations.removeLSB(moves);
+            }
+            queens = BitOperations.removeLSB(queens);
         }
     }
 }
