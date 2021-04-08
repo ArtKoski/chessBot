@@ -2,24 +2,26 @@ package datastructureproject;
 
 import datastructureproject.Evaluation.BoardEvaluation;
 import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.move.Move;
 import datastructureproject.Evaluation.*;
 import java.util.List;
 
 /**
- *
- * MiniMax algorithm. Picks the best evaluated move with a given depth. Becomes
- * inefficient (slow) beyond depth 3.
+ * MiniMax with Alpha-Beta pruning. Otherwise an exact copy of MiniMax class,
+ * but now min/max -method calls carry on alpha and beta parameters, which can
+ * be used to figure out if future branches can be left uncalculated altogether.
  *
  * @author artkoski
  */
-public class MiniMax {
+public class MiniMaxAB {
 
     private MovesGenerator moveGenerator;
     private BoardEvaluation evaluator;
 
-    public MiniMax(Board b) {
+    int highestValue = Integer.MIN_VALUE;
+    int lowestValue = Integer.MAX_VALUE;
+
+    public MiniMaxAB(Board b) {
         moveGenerator = new MovesGenerator();
         evaluator = new SimpleEvaluator();
     }
@@ -28,30 +30,23 @@ public class MiniMax {
         return board.getSideToMove().value().equals("WHITE");
     }
 
-    /**
-     * To use minimax, launch is called. Expected to be used when it is the
-     * players(bots) turn.
-     *
-     * @param board - current board
-     * @param depth - how deep the algorithm calculates
-     * @return the best evaluated move with given depth
-     */
     public Move launch(Board board, int depth) {
+
+        highestValue = Integer.MIN_VALUE;
+        lowestValue = Integer.MAX_VALUE;
 
         List<Move> moves = moveGenerator.generateLegalMoves(board);
 
         Move bestMove = null;
 
-        int highestValue = Integer.MIN_VALUE;
-        int lowestValue = Integer.MAX_VALUE;
         int currentValue;
         Board tempBoard = board.clone();
 
         for (Move move : moves) {
             tempBoard.doMove(move);
             currentValue = (isWhiteTurn(tempBoard))
-                    ? max(tempBoard, (depth - 1))
-                    : min(tempBoard, (depth - 1));
+                    ? max(tempBoard, (depth - 1), highestValue, lowestValue)
+                    : min(tempBoard, (depth - 1), highestValue, lowestValue);
             tempBoard.undoMove();
 
             if (isWhiteTurn(tempBoard) && currentValue >= highestValue) {
@@ -59,67 +54,74 @@ public class MiniMax {
                 bestMove = move;
 
             } else if (!isWhiteTurn(tempBoard) && currentValue <= lowestValue) {
+
+                // System.out.println("updated best move: " + move.toString() + " with valuation of " + currentValue);
                 lowestValue = currentValue;
                 bestMove = move;
             }
-
         }
 
         return bestMove;
     }
 
     /**
-     * Part of the algorithm. Used for finding the move that MINIMIZES score,
-     * AKA the best move for BLACK.
-     *
+     * Finds the move that minimizes score. 
      * @param board - current board
      * @param depth - current depth
-     * @return current branch evaluation
+     * @param alpha - current MINIMUM score 
+     * @param beta - current MAXIMUM score
+     * @return best score for black
      */
-    public int min(Board board, int depth) {
+    public int min(Board board, int depth, int alpha, int beta) {
 
         if (depth == 0 || BitOperations.isCheckMate(board)) {
             return evaluator.evaluateBoard(board);
         }
 
-        int lowestValue = Integer.MAX_VALUE;
+        int lowestCurrentValue = Integer.MAX_VALUE;
         for (Move move : moveGenerator.generateLegalMoves(board)) {
             board.doMove(move);
-            int enemysBestMove = max(board, (depth - 1));
+            int whitesBestMove = max(board, (depth - 1), alpha, beta);
             board.undoMove();
-            if (enemysBestMove <= lowestValue) {
-                lowestValue = enemysBestMove;
-            }
 
+            lowestCurrentValue = Math.min(whitesBestMove, lowestCurrentValue);
+
+            beta = Math.min(beta, whitesBestMove);
+            if (beta <= alpha) {
+                return Integer.MIN_VALUE;
+            }
         }
 
-        return lowestValue;
+        return lowestCurrentValue;
     }
 
     /**
-     * Part of the algorithm. Used for finding the move that MAXIMIZES score,
-     * AKA the best move for WHITE.
-     *
+     * Finds the move that maximises score.
      * @param board - current board
      * @param depth - current depth
-     * @return current branch evaluation
+     * @param alpha - current MINIMUM
+     * @param beta - current MAXIMUM
+     * @return best score for white
      */
-    public int max(Board board, int depth) {
+    public int max(Board board, int depth, int alpha, int beta) {
         if (depth == 0 || BitOperations.isCheckMate(board)) {
             return evaluator.evaluateBoard(board);
         }
 
-        int highestValue = Integer.MIN_VALUE;
+        int highestCurrentValue = Integer.MIN_VALUE;
         for (Move move : moveGenerator.generateLegalMoves(board)) {
             board.doMove(move);
-            int enemysBestMove = min(board, (depth - 1));
+            int blacksBestMove = min(board, (depth - 1), alpha, beta);
             board.undoMove();
-            if (enemysBestMove >= highestValue) {
-                highestValue = enemysBestMove;
-            }
 
+            highestCurrentValue = Math.max(highestCurrentValue, blacksBestMove);
+
+            alpha = Math.max(alpha, blacksBestMove);
+            if (beta <= alpha) {
+                return Integer.MAX_VALUE;
+            }
         }
 
-        return highestValue;
+        return highestCurrentValue;
     }
 }

@@ -385,7 +385,7 @@ public class MoveGeneratorTest {
     
     public void generatingMovesIsNotTooSlow() {
         long startTime = System.currentTimeMillis();
-        gen.GenerateLegalMoves(b);
+        gen.generateLegalMoves(b);
         System.out.println("moveGen took: " + (System.currentTimeMillis() - startTime));
         
     }

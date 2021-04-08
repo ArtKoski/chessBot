@@ -7,8 +7,8 @@ import com.github.bhlangonijr.chesslib.PieceType;
 import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -18,50 +18,70 @@ import java.util.List;
 public class MovesGenerator {
 
     BitOperations bitboard;
+    LinkedList<Move> moveList;
 
-    public ArrayList<Move> GenerateLegalMoves(Board b) {
+    public MovesGenerator() {
         bitboard = new BitOperations();
-        ArrayList<Move> moves = new ArrayList<>();
+    }
+
+    /**
+     * Generate all legal moves for side in play. First generates pseudo legal
+     * moves, then filters out illegal moves.
+     *
+     * @param b - current board
+     * @return list of legal moves
+     */
+    public LinkedList<Move> generateLegalMoves(Board b) {
+        moveList = new LinkedList<>();
         long ownPieces = b.getBitboard(b.getSideToMove());
 
-        generateKnightMoves(b, moves, ownPieces);
-        generatePawnMoves(b, moves);
-        generatePawnCaptures(b, moves);
-        generateRookMoves(b, moves);
-        generateBishopMoves(b, moves);
-        generateQueenMoves(b, moves);
-        generateKingMoves(b, moves, ownPieces);
+        generateKnightMoves(b, moveList, ownPieces);
+        generatePawnMoves(b, moveList);
+        generatePawnCaptures(b, moveList);
+        generateRookMoves(b, moveList);
+        generateBishopMoves(b, moveList);
+        generateQueenMoves(b, moveList);
+        generateKingMoves(b, moveList, ownPieces);
         //generateCastleMoves(b, moves);
 
-        for (Iterator<Move> iterator = moves.iterator(); iterator.hasNext();) {
+        for (Iterator<Move> iterator = moveList.iterator(); iterator.hasNext();) {
             Move move = iterator.next();
             if (!BitOperations.isMoveLegal(move, b)) {
                 iterator.remove();
             }
         }
 
-        //System.out.println(b.getSideToMove() + " Moves found: " + moves);
-
-        return moves;
+        return moveList;
     }
 
+    /**
+     * Iterates through all (own) knights. For every knight, finds the available
+     * knight moves and adds them to the list. Since bitboards are used for
+     * everything, iterating is done with bitScanForward and removeLSB, which
+     * both have to do with Least Significant Bits. 
+     * All the following generating methods use the same logic.
+     *
+     * @param b - current board
+     * @param moveList - list of moves
+     * @param ownPieces - bitboard of own pieces for filtering
+     */
     public void generateKnightMoves(Board b, List<Move> moveList, long ownPieces) {
-        long knights = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.KNIGHT)); //get own side knights as bitboard
+        long knights = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.KNIGHT));
 
-        while (knights != 0L) {                                      //Go through the knights
-            int pieceIndex = BitOperations.bitScanForward(knights);    //index of the least significant bit (from knights)
-            Square squareCurrent = Square.squareAt(pieceIndex);        //square of the just removed piece
+        while (knights != 0L) {
+            int pieceIndex = BitOperations.bitScanForward(knights);
+            Square squareCurrent = Square.squareAt(pieceIndex);
             long moves = BitOperations.getKnightMoves(squareCurrent, ownPieces);
 
             while (moves != 0L) {
-                int targetIndex = BitOperations.bitScanForward(moves); //Same as above, but with attacks
+                int targetIndex = BitOperations.bitScanForward(moves);
                 Square squareTarget = Square.squareAt(targetIndex);
                 Move newMove = new Move(squareCurrent, squareTarget, Piece.NONE);
                 moveList.add(newMove);
 
                 moves = BitOperations.removeLSB(moves);
             }
-            knights = BitOperations.removeLSB(knights);              //AND operation to remove least significant bit
+            knights = BitOperations.removeLSB(knights);
         }
     }
 

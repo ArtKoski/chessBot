@@ -13,6 +13,7 @@ import java.util.Random;
 
 import com.github.bhlangonijr.chesslib.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
     
 
@@ -66,11 +67,10 @@ public class TemporaryBot implements ChessBot {
      */
     public Move getMove() throws MoveGeneratorException {
         //own implementation of legal moves
-        ArrayList<Move> moves = moveGenerator.GenerateLegalMoves(b);
+        LinkedList<Move> moves = moveGenerator.generateLegalMoves(b);
         
-        //Returns null if no legal moves available, else returns a randomly selected legal move.
         if (moves.size() > 0) {
-            //Here MiniMax
+            //Here MiniMax (not yet)
             return moves.get(random.nextInt(moves.size()));
         } else {
             return null;

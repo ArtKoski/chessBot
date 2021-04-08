@@ -9,4 +9,7 @@ Tällä hetkellä kaikki tekemäni löytyy [datastructureproject:in alta](https:
   
 [Viikkoraportti 2](https://github.com/ArtKoski/chessBot/blob/master/documentation/tekoäly/viikkoraportti2.md)
 
+[Viikkoraportti 3](https://github.com/ArtKoski/chessBot/blob/master/documentation/tekoäly/viikkoraportti3.md)
+
+
 

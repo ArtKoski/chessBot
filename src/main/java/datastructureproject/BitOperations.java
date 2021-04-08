@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Provides some bitboard operations to solve the possible moves.
+ * Provides some bitboard operations to solve the possible moves. Might have too
+ * many different methods at the moment (might need to split up the class).
  */
 public class BitOperations {
 
@@ -47,6 +48,9 @@ public class BitOperations {
 
     final static long[] adjacentSquares = new long[64];
 
+    /**
+     * Generates possible pawn moves for each square.
+     */
     static {
         Square current;
         long currentBB;
@@ -71,7 +75,7 @@ public class BitOperations {
     }
 
     /**
-     * Generates possible knight moves.
+     * Generates possible knight moves for each square.
      */
     static {
         Square current;
@@ -97,7 +101,7 @@ public class BitOperations {
     }
 
     /**
-     * Generates adjacent squares for every square
+     * Generates adjacent squares for every square.
      */
     static {
         Square current;
@@ -164,6 +168,11 @@ public class BitOperations {
         rookRays[3][63] = 0x7f00000000000000L;
     }
 
+    /**
+     * Following getters are mostly for testing.
+     *
+     * @return pre-calculated array of possible knight moves.
+     */
     public static long[] getKnightAttacks() {
         return knightAttacks;
     }
@@ -200,6 +209,15 @@ public class BitOperations {
         return (String.valueOf(side).equals("WHITE")) ? whitePawnAttacks : blackPawnAttacks;
     }
 
+    /**
+     * Find the possible moves from precalculated array 'knightAttacks', and
+     * filter the moves with own pieces on the board. (since you can't eat own
+     * pieces)
+     *
+     * @param square - current square
+     * @param ownPieces - bitboard of own pieces for filtering
+     * @return pseudo legal knight moves (as bitboard)
+     */
     public static long getKnightMoves(Square square, long ownPieces) {
         return knightAttacks[square.ordinal()] & ~ownPieces;
     }
@@ -209,11 +227,11 @@ public class BitOperations {
      * moves are returned after an AND operation with the possible moves and the
      * unoccupied squares.
      *
-     * @param square of the pawn in question
-     * @param side of the pawn in question
-     * @param occupied = bitboard representing all pieces (=all occupied
+     * @param square - of pawn in question
+     * @param side - of pawn in question
+     * @param occupied - bitboard representing all pieces (=all occupied
      * squares)
-     * @return
+     * @return pseudo legal pawn moves (as bitboard)
      */
     public static long getPawnMoves(Square square, Side side, long occupied) {
         long pawnMoves;
@@ -225,7 +243,7 @@ public class BitOperations {
                     return 0L;
                 }
             }
-            pawnMoves = whitePawnMoves[square.ordinal()] & ~occupied; //available moves have to be both natural and unoccupied
+            pawnMoves = whitePawnMoves[square.ordinal()] & ~occupied;
         } else {
             if (square.getRank().equals(Rank.RANK_7)) {
                 long squareInFront = square.getBitboard() >> 8;
@@ -245,10 +263,10 @@ public class BitOperations {
     /**
      * Return normal (diagonal) pawn captures. No 'en passant' atm.
      *
-     * @param square of the pawn in question
-     * @param enemyPieces bitboard representing enemy pieces squares
-     * @param side of the pawn in question
-     * @return bitboard of pseudolegal pawn attacks
+     * @param square - of pawn in question
+     * @param enemyPieces - bitboard representing enemy pieces
+     * @param side - of pawn in question
+     * @return pseudolegal pawn attacks (as bitboard)
      */
     public static long getPawnCaptures(Square square, Side side, long enemyPieces) {
         long pawnAttacks;
@@ -265,9 +283,9 @@ public class BitOperations {
      * Goes through all the directions (NE,SW,NW,SE) and uses masks and
      * forward/reverse scan to figure out bishops possible attack squares.
      *
-     * @param square square of the bishop
-     * @param occupied bitboard representing occupied squares
-     * @return
+     * @param square - of the bishop
+     * @param occupied - bitboard representing occupied squares
+     * @return pseudolegal bishop attacks (as bitboard)
      */
     public static long getBishopMoves(Square square, long occupied) {
         long bishopAttacks = 0L;
@@ -287,18 +305,14 @@ public class BitOperations {
         return bishopAttacks;
     }
 
-    public static long getQueenMoves(Square square, long occupied) {
-        return (getBishopMoves(square, occupied) | getRookMoves(square, occupied));
-    }
-
     /**
-     * Need to clean up a little | Calculates the diagonals from the defined
-     * square. Handles NE and SW rays. (North-East, South-West) Used for
-     * generating a pre-calculated array for the bishops 'rays'.
+     * Calculates the diagonals from the defined square. Handles NE and SW rays.
+     * (North-East, South-West) Used for generating a pre-calculated array for
+     * the bishops 'rays'.
      *
-     * @param square of the bishop
-     * @param way (expected values: (NE | SW))
-     * @return
+     * @param square - current square
+     * @param way - expected values: (NE | SW)
+     * @return diagonal attack ray (as bitboard)
      */
     public static long getBishopRaysNESW(long square, String way) {
         long bishopAttacks = 0L;
@@ -319,9 +333,9 @@ public class BitOperations {
      * (South-East, North-West). Used for generating a pre-calculated array for
      * the bishops 'rays'.
      *
-     * @param square of the bishop
-     * @param way (expected values: (NW | SE))
-     * @return
+     * @param square - current square
+     * @param way - expected values: (NW | SE)
+     * @return diagonal attack ray (as bitboard)
      */
     public static long getBishopRaysSENW(long square, String way) {
         long bishopAttacks = 0L;
@@ -337,11 +351,12 @@ public class BitOperations {
     }
 
     /**
-     * Needs rework.
+     * Goes through all the directions (N,E,S,W) and uses masks and
+     * forward/reverse scan to figure out rooks possible attack squares.
      *
-     * @param square of the rook
+     * @param square - current square
      * @param occupied - bitboard representation of occupied squares
-     * @return
+     * @return pseudolegal rook attacks (as bitboard)
      */
     public static long getRookMoves(Square square, long occupied) {
         long rookAttacks = 0L;
@@ -409,12 +424,23 @@ public class BitOperations {
     }
 
     /**
+     * Combine getBishopMoves and getRookMoves.
+     *
+     * @param square - current square
+     * @param occupied - bitboard representation of occupied squares
+     * @return
+     */
+    public static long getQueenMoves(Square square, long occupied) {
+        return (getBishopMoves(square, occupied) | getRookMoves(square, occupied));
+    }
+
+    /**
      * Same logic as knight: an AND operation between kings possible moves
      * (=adjacent squares to king) and own pieces.
      *
-     * @param square of the king
-     * @param ownPieces bitboard representation of own pieces
-     * @return kings pseudolegal moves as bitboard
+     * @param square - of the king
+     * @param ownPieces - bitboard representation of own pieces
+     * @return kings pseudolegal moves (as bitboard)
      */
     public static long getKingMoves(Square square, long ownPieces) {
         return adjacentSquares[square.ordinal()] & ~ownPieces;
@@ -459,8 +485,8 @@ public class BitOperations {
      * Used for realizing a move on a temporary board to find out if it is legal
      * or not.
      *
-     * @param move
-     * @param b
+     * @param move - move to be realized
+     * @param b - current board
      */
     public static void pseudoMove(Move move, Board b) {
         Square from = move.getFrom();
@@ -473,6 +499,13 @@ public class BitOperations {
 
     }
 
+    /**
+     * Used to filter illegal moves. If a move is illegal, returns false.
+     *
+     * @param move - current move
+     * @param b - current board
+     * @return true if move is legal, otherwise false
+     */
     public static boolean isMoveLegal(Move move, Board b) {
         Board tempBoard = b.clone();
 
@@ -485,7 +518,7 @@ public class BitOperations {
 
     public static boolean isCheckMate(Board b) {
         MovesGenerator generator = new MovesGenerator();
-        return generator.GenerateLegalMoves(b).isEmpty() && isKingAttacked(b);
+        return generator.generateLegalMoves(b).isEmpty() && isKingAttacked(b);
     }
 
     public static boolean isKingAttacked(Board b) {
@@ -493,9 +526,8 @@ public class BitOperations {
     }
 
     /**
-     * If the king moved, then checks for all threats. Otherwise checks only for
-     * file and diagonal attacks between the king and enemy
-     * rooks/bishops/queens.
+     * Not sure what all needs to be calculated here. Works for the time being,
+     * but will need to come back to this.
      *
      * @param b - current board
      * @param square - kings square

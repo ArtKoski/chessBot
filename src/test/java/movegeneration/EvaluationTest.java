@@ -36,10 +36,11 @@ public class EvaluationTest {
     BitOperations bitboard;
     BoardEvaluation eval;
     MiniMax miniMax;
-    
+    MiniMaxAB miniMaxAB;
+
     /*
     First String is FEN notation as an ID, second String is the best (expected) play.
-    */
+     */
     HashMap<String, String> setups;
 
     public EvaluationTest() {
@@ -49,6 +50,7 @@ public class EvaluationTest {
         bitboard = new BitOperations();
         eval = new SimpleEvaluator();
         miniMax = new MiniMax(b);
+        miniMaxAB = new MiniMaxAB(b);
         setups = new HashMap<>();
 
     }
@@ -85,8 +87,8 @@ public class EvaluationTest {
         int evalResult = eval.evaluateBoard(b);
         assertEquals(-900, evalResult);
     }
-    
-    //
+
+    //Normal MiniMax, with SimpleEval
     @Test
     public void testAllSetups() {
         initializeSetups();
@@ -94,7 +96,20 @@ public class EvaluationTest {
             b.loadFromFen(bId);
             long startTime = System.currentTimeMillis();
             Move bestMove = miniMax.launch(b, 3);
-            System.out.println("Minmax took: " + (System.currentTimeMillis() - startTime));
+            System.out.println("(depth 3) Minmax took: " + (System.currentTimeMillis() - startTime));
+            assertEquals(setups.get(bId), bestMove.toString());
+        }
+    }
+
+    //Alpha-Beta, with SimpleEval
+    @Test
+    public void testAllSetupsAB() {
+        initializeSetups();
+        for (String bId : setups.keySet()) {
+            b.loadFromFen(bId);
+            long startTime = System.currentTimeMillis();
+            Move bestMove = miniMaxAB.launch(b, 4);
+            System.out.println("(depth 4) Minmax w/ AB took: " + (System.currentTimeMillis() - startTime));
             assertEquals(setups.get(bId), bestMove.toString());
         }
     }
@@ -138,7 +153,7 @@ public class EvaluationTest {
         b.setPiece(Piece.BLACK_KING, Square.H5);
         setups.put(b.getFen(), "e4g3");
     }
-    
+
     private void freeQueenWithDiscoverAttackSetup() {
         b.clear();
         b.setPiece(Piece.WHITE_KING, Square.C5);
@@ -146,8 +161,7 @@ public class EvaluationTest {
         b.setPiece(Piece.BLACK_QUEEN, Square.H5);
         b.setPiece(Piece.BLACK_KING, Square.E5);
         setups.put(b.getFen(), "d3d5");
-        
-        
+
     }
 
 }

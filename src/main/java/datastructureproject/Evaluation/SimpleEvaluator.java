@@ -26,16 +26,37 @@ public class SimpleEvaluator implements BoardEvaluation {
         values.put("KING", 10000);
     }
 
+    /**
+     * Used to evaluate the current board.
+     *
+     * @param board - current board
+     * @return evaluation
+     */
     @Override
     public int evaluateBoard(Board board) {
         //System.out.println(evaluateSide(Side.WHITE, board) + " vs " + evaluateSide(Side.BLACK, board));
         return (evaluateSide(Side.WHITE, board) - evaluateSide(Side.BLACK, board));
     }
 
+    /**
+     * Evaluate given side
+     *
+     * @param side - Side.WHITE or Side.BLACK
+     * @param board - current board
+     * @return evaluation
+     */
     private int evaluateSide(Side side, Board board) {
         return evaluateScore(side, board) + isCheckMate(side, board);
     }
 
+    /**
+     * Evaluation based on how many and which pieces are on the board for the
+     * given side.
+     *
+     * @param side - Side.WHITE or Side.BLACK
+     * @param board - curent board
+     * @return sum of piece values
+     */
     private int evaluateScore(Side side, Board board) {
         long pieces = board.getBitboard(side);
         int score = 0;
@@ -50,8 +71,7 @@ public class SimpleEvaluator implements BoardEvaluation {
         return score;
 
     }
-    
-    
+
     private int isCheckMate(Side side, Board b) {
         Board opponentsPOV = b.clone();
         opponentsPOV.setSideToMove(side.flip());
