@@ -11,8 +11,13 @@ Minimaxin testaamista varten testiluokassa ensin alustetaan tavanomaisia shakkit
 Esimerkkitilanteita ovat mm:
 
 Yhden siirron shakkimatti  |  'Ilmainen' kuningatar | 'Ilmainen' kuningatar kahden siirron päässä | 'Royal Fork' |
-:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
-![](https://github.com/ArtKoski/chessBot/tree/master/documentation/tekoäly/kuvat/checkMate.png)  |  ![](https://github.com/ArtKoski/chessBot/tree/master/documentation/tekoäly/kuvat/freeQueen.png)  |
-![](https://github.com/ArtKoski/chessBot/tree/master/documentation/tekoäly/kuvat/freeQueenDiscover.png)  |
-![](https://github.com/ArtKoski/chessBot/tree/master/documentation/tekoäly/kuvat/royalFork.png) | 
+:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|
+<img src="https://github.com/ArtKoski/chessBot/tree/master/documentation/tekoäly/kuvat/checkMate.png"> |  <img src="https://github.com/ArtKoski/chessBot/tree/master/documentation/tekoäly/kuvat/freeQueen.png"> | <img src="https://github.com/ArtKoski/chessBot/tree/master/documentation/tekoäly/kuvat/freeQueenDiscover.png">  | <img src="https://github.com/ArtKoski/chessBot/tree/master/documentation/tekoäly/kuvat/royalFork.png">
+
+
+
+
+
+
+
 
