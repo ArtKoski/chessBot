@@ -23,7 +23,7 @@ public class MiniMaxAB {
 
     public MiniMaxAB(Board b) {
         moveGenerator = new MovesGenerator();
-        evaluator = new SimpleEvaluator();
+        evaluator = new ComplexEvaluator();
     }
 
     private boolean isWhiteTurn(Board board) {
@@ -54,8 +54,6 @@ public class MiniMaxAB {
                 bestMove = move;
 
             } else if (!isWhiteTurn(tempBoard) && currentValue <= lowestValue) {
-
-                // System.out.println("updated best move: " + move.toString() + " with valuation of " + currentValue);
                 lowestValue = currentValue;
                 bestMove = move;
             }
@@ -65,16 +63,17 @@ public class MiniMaxAB {
     }
 
     /**
-     * Finds the move that minimizes score. 
+     * Finds the move that minimizes score.
+     *
      * @param board - current board
      * @param depth - current depth
-     * @param alpha - current MINIMUM score 
+     * @param alpha - current MINIMUM score
      * @param beta - current MAXIMUM score
      * @return best score for black
      */
     public int min(Board board, int depth, int alpha, int beta) {
 
-        if (depth == 0 || BitOperations.isCheckMate(board)) {
+        if (depth == 0 || BoardOperations.isGameOver(board)) {
             return evaluator.evaluateBoard(board);
         }
 
@@ -97,6 +96,7 @@ public class MiniMaxAB {
 
     /**
      * Finds the move that maximises score.
+     *
      * @param board - current board
      * @param depth - current depth
      * @param alpha - current MINIMUM
@@ -104,7 +104,7 @@ public class MiniMaxAB {
      * @return best score for white
      */
     public int max(Board board, int depth, int alpha, int beta) {
-        if (depth == 0 || BitOperations.isCheckMate(board)) {
+        if (depth == 0 || BoardOperations.isGameOver(board)) {
             return evaluator.evaluateBoard(board);
         }
 

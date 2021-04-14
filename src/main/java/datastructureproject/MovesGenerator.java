@@ -19,47 +19,70 @@ public class MovesGenerator {
 
     BitOperations bitboard;
     LinkedList<Move> moveList;
+    LinkedList<Move> attacks;
 
     public MovesGenerator() {
         bitboard = new BitOperations();
+        moveList = new LinkedList();
     }
 
     /**
      * Generate all legal moves for side in play. First generates pseudo legal
-     * moves, then filters out illegal moves.
+     * moves, then filters out illegal moves, then sorts by 'checks'.
      *
      * @param b - current board
      * @return list of legal moves
      */
     public LinkedList<Move> generateLegalMoves(Board b) {
-        moveList = new LinkedList<>();
+        moveList = new LinkedList();
+        attacks = new LinkedList();
         long ownPieces = b.getBitboard(b.getSideToMove());
 
         generateKnightMoves(b, moveList, ownPieces);
+        generateKingMoves(b, moveList, ownPieces);
         generatePawnMoves(b, moveList);
         generatePawnCaptures(b, moveList);
         generateRookMoves(b, moveList);
         generateBishopMoves(b, moveList);
         generateQueenMoves(b, moveList);
-        generateKingMoves(b, moveList, ownPieces);
         //generateCastleMoves(b, moves);
 
-        for (Iterator<Move> iterator = moveList.iterator(); iterator.hasNext();) {
-            Move move = iterator.next();
-            if (!BitOperations.isMoveLegal(move, b)) {
-                iterator.remove();
-            }
-        }
+        filterMoveList(b);
 
         return moveList;
+    }
+
+    /**
+     * Remove illegal moves and rearrange the moves: first checks, then
+     * captures, then the rest.
+     *
+     * @param b - current board
+     */
+    public void filterMoveList(Board b) {
+        for (Iterator<Move> iterator = moveList.iterator(); iterator.hasNext();) {
+            Move move = iterator.next();
+            if (!BoardOperations.isMoveLegal(move, b)) {
+                iterator.remove();
+                continue;
+            }
+            if (BoardOperations.isEnemyKingCheckedAfterMove(move, b)) {
+                attacks.addFirst(move);
+                iterator.remove();
+            } else if (BoardOperations.isMoveCapture(move, b)) {
+                attacks.addLast(move);
+            }
+
+        }
+        attacks.addAll(moveList);
+        moveList = attacks;
     }
 
     /**
      * Iterates through all (own) knights. For every knight, finds the available
      * knight moves and adds them to the list. Since bitboards are used for
      * everything, iterating is done with bitScanForward and removeLSB, which
-     * both have to do with Least Significant Bits. 
-     * All the following generating methods use the same logic.
+     * both have to do with Least Significant Bits. All the following generating
+     * methods use the same logic.
      *
      * @param b - current board
      * @param moveList - list of moves

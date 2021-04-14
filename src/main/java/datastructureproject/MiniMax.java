@@ -78,7 +78,7 @@ public class MiniMax {
      */
     public int min(Board board, int depth) {
 
-        if (depth == 0 || BitOperations.isCheckMate(board)) {
+        if (depth == 0 || BoardOperations.isCheckMate(board)) {
             return evaluator.evaluateBoard(board);
         }
 
@@ -105,7 +105,7 @@ public class MiniMax {
      * @return current branch evaluation
      */
     public int max(Board board, int depth) {
-        if (depth == 0 || BitOperations.isCheckMate(board)) {
+        if (depth == 0 || BoardOperations.isCheckMate(board)) {
             return evaluator.evaluateBoard(board);
         }
 

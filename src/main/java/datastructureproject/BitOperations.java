@@ -11,8 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Provides some bitboard operations to solve the possible moves. Might have too
- * many different methods at the moment (might need to split up the class).
+ * Provides some bitboard operations to solve the possible moves.
  */
 public class BitOperations {
 
@@ -479,93 +478,6 @@ public class BitOperations {
                 | b.getBitboard(Piece.make(enemySide, PieceType.QUEEN))));
 
         return attacks;
-    }
-
-    /**
-     * Used for realizing a move on a temporary board to find out if it is legal
-     * or not.
-     *
-     * @param move - move to be realized
-     * @param b - current board
-     */
-    public static void pseudoMove(Move move, Board b) {
-        Square from = move.getFrom();
-        Square to = move.getTo();
-        if (!b.getPiece(to).value().equals("NONE")) {
-            b.unsetPiece(b.getPiece(to), to);
-        }
-        b.setPiece(b.getPiece(from), to);
-        b.unsetPiece(b.getPiece(from), from);
-
-    }
-
-    /**
-     * Used to filter illegal moves. If a move is illegal, returns false.
-     *
-     * @param move - current move
-     * @param b - current board
-     * @return true if move is legal, otherwise false
-     */
-    public static boolean isMoveLegal(Move move, Board b) {
-        Board tempBoard = b.clone();
-
-        pseudoMove(move, tempBoard);
-        Square kingSquare = getKingSquare(tempBoard, tempBoard.getSideToMove());
-        boolean isKingMove = (move.getTo() == kingSquare);
-
-        return !BitOperations.isKingChecked(tempBoard, kingSquare, isKingMove);
-    }
-
-    public static boolean isCheckMate(Board b) {
-        MovesGenerator generator = new MovesGenerator();
-        return generator.generateLegalMoves(b).isEmpty() && isKingAttacked(b);
-    }
-
-    public static boolean isKingAttacked(Board b) {
-        return squareAttackedBy(b.getSideToMove().flip(), b, getKingSquare(b, b.getSideToMove())) != 0;
-    }
-
-    /**
-     * Not sure what all needs to be calculated here. Works for the time being,
-     * but will need to come back to this.
-     *
-     * @param b - current board
-     * @param square - kings square
-     * @param isKingMove - true if current move is a king move.
-     * @return
-     */
-    public static boolean isKingChecked(Board b, Square square, boolean isKingMove) {
-
-        Side enemySide = b.getSideToMove().flip();
-        long allPieces = b.getBitboard();
-
-        long enemyRooks = b.getBitboard(Piece.make(enemySide, PieceType.ROOK));
-        long enemyBishops = b.getBitboard(Piece.make(enemySide, PieceType.BISHOP));
-        long enemyQueens = b.getBitboard(Piece.make(enemySide, PieceType.QUEEN));
-
-        /*
-        if (isKingMove) {
-            if (squareAttackedBy(enemySide, b, square) != 0) {
-                return true;
-            }
-        }*/
-        if (isKingAttacked(b)) {
-            return true;
-        }
-
-        /*
-        if ((enemyRooks & getRookMoves(square, allPieces)) != 0L) {  //Open file/rank between rook and king
-            return true;
-        }
-
-        if ((enemyBishops & getBishopMoves(square, allPieces)) != 0L) {  //Open diagonal between bishop and king
-            return true;
-        }
-
-        if ((enemyQueens & getQueenMoves(square, allPieces)) != 0L) {  //Open file/rank/diagonal between queen and king
-            return true;
-        }*/
-        return false;
     }
 
     /**
