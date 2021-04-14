@@ -5,6 +5,7 @@ import com.github.bhlangonijr.chesslib.Piece;
 import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
 import datastructureproject.BitOperations;
+import datastructureproject.BoardOperations;
 import java.util.HashMap;
 
 /**
@@ -45,7 +46,7 @@ public class SimpleEvaluator implements BoardEvaluation {
      * @param board - current board
      * @return evaluation
      */
-    private int evaluateSide(Side side, Board board) {
+    public int evaluateSide(Side side, Board board) {
         return evaluateScore(side, board) + isCheckMate(side, board);
     }
 
@@ -57,7 +58,7 @@ public class SimpleEvaluator implements BoardEvaluation {
      * @param board - curent board
      * @return sum of piece values
      */
-    private int evaluateScore(Side side, Board board) {
+    public int evaluateScore(Side side, Board board) {
         long pieces = board.getBitboard(side);
         int score = 0;
 
@@ -72,10 +73,10 @@ public class SimpleEvaluator implements BoardEvaluation {
 
     }
 
-    private int isCheckMate(Side side, Board b) {
+    public int isCheckMate(Side side, Board b) {
         Board opponentsPOV = b.clone();
         opponentsPOV.setSideToMove(side.flip());
-        return BitOperations.isCheckMate(opponentsPOV) ? 10000 : 0;
+        return BoardOperations.isCheckMate(opponentsPOV) ? 10000 : 0;
     }
 
 }
