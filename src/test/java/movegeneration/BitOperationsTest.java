@@ -145,22 +145,6 @@ public class BitOperationsTest {
             }
             assertEquals(testi[x], knightAttacks[x]);
         }
-
-    }
-
-    //@Test
-    public void rookRays() {
-        /*
-        System.out.println(BitOperations.getBishopRays()[0][63]);
-        System.out.println(BitOperations.getBishopRays()[1][63]);
-        System.out.println(BitOperations.getBishopRays()[2][63]);
-        System.out.println(BitOperations.getBishopRays()[3][63]);
-         
-        System.out.println(BitOperations.getRookRays()[0][63]);
-        System.out.println(BitOperations.getRookRays()[1][63]);
-        System.out.println(BitOperations.getRookRays()[2][63]);
-        System.out.println(BitOperations.getRookRays()[3][63]);
-         */
     }
 
     @Test
@@ -200,52 +184,19 @@ public class BitOperationsTest {
         assertEquals(0x47000005000L, attacks);
     }
 
-    //TESTS FOR FILTERING PSEUDOLEGAL MOVES
-    public void boardForCheckTesting() {
-        b.clear();
-        b.setPiece(Piece.WHITE_KING, Square.C3);
-        b.setPiece(Piece.WHITE_PAWN, Square.E3);
-        b.setPiece(Piece.BLACK_ROOK, Square.B4);
-        b.setPiece(Piece.BLACK_PAWN, Square.D5);
-        b.setPiece(Piece.BLACK_KNIGHT, Square.D4);
-        b.setPiece(Piece.BLACK_QUEEN, Square.F3);
-        b.setSideToMove(Side.WHITE);
-    }
-
-    /**
-     * This is supposed to be used with specific setup of boardForCheckTesting.
-     */
-    public void setMovesList() {
-        //ILLEGAL MOVES
-        moves.add(new Move(Square.C3, Square.B3));    //Rook+Knight check
-        moves.add(new Move(Square.C3, Square.B2));    //Rook check
-        moves.add(new Move(Square.C3, Square.C4));    //Rook+Pawn check
-        moves.add(new Move(Square.C3, Square.C2));    //Knight check
-        moves.add(new Move(Square.C3, Square.D4));    //Rook check
-        moves.add(new Move(Square.E3, Square.E4));    //Queen discover check
-        
-        //LEGAL MOVES
-        moves.add(new Move(Square.C3, Square.B4));    //Legal rook capture
-        moves.add(new Move(Square.C3, Square.D2));    //Legal move
-    }
-    
-    @Test
-    public void isMoveLegal() {
-        boardForCheckTesting();
-        setMovesList();
-        moves.forEach((move) -> {
-            assertMoveIsLegal(move, b);
-        });
-    }
-
-    
-    public static void assertMoveIsLegal(Move move, Board b) {
-        try {
-            assertEquals(b.isMoveLegal(move, true), BitOperations.isMoveLegal(move, b));
-        } catch (AssertionError e) {
-            System.out.println(move.toString() + " - failed");
-            throw e;
-        }
+    //@Test ray generation not tested atm. dunno if needed
+    public void rookRays() {
+        /*
+        System.out.println(BitOperations.getBishopRays()[0][63]);
+        System.out.println(BitOperations.getBishopRays()[1][63]);
+        System.out.println(BitOperations.getBishopRays()[2][63]);
+        System.out.println(BitOperations.getBishopRays()[3][63]);
+         
+        System.out.println(BitOperations.getRookRays()[0][63]);
+        System.out.println(BitOperations.getRookRays()[1][63]);
+        System.out.println(BitOperations.getRookRays()[2][63]);
+        System.out.println(BitOperations.getRookRays()[3][63]);
+         */
     }
 
 }

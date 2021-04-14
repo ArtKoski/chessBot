@@ -10,6 +10,7 @@ import com.github.bhlangonijr.chesslib.Piece;
 import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
+import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
 import datastructureproject.BitOperations;
 import datastructureproject.Evaluation.BoardEvaluation;
 import datastructureproject.Evaluation.SimpleEvaluator;
@@ -28,7 +29,7 @@ import static org.junit.Assert.*;
  *
  * @author artkoski
  */
-public class EvaluationTest {
+public class MiniMaxTest {
 
     MovesGenerator gen;
     Board b;
@@ -43,7 +44,7 @@ public class EvaluationTest {
      */
     HashMap<String, String> setups;
 
-    public EvaluationTest() {
+    public MiniMaxTest() {
         b = new Board();
         gen = new MovesGenerator();
         moves = new ArrayList<>();
@@ -89,9 +90,9 @@ public class EvaluationTest {
     }
 
     //Normal MiniMax, with SimpleEval
-    @Test
+    //@Test
     public void testAllSetups() {
-        initializeSetups();
+        initializeDepth3Setups();
         for (String bId : setups.keySet()) {
             b.loadFromFen(bId);
             long startTime = System.currentTimeMillis();
@@ -104,21 +105,43 @@ public class EvaluationTest {
     //Alpha-Beta, with SimpleEval
     @Test
     public void testAllSetupsAB() {
-        initializeSetups();
+        initializeDepth3Setups();
+        initializeDepth5Setups();
+
+        int sum = 0;
         for (String bId : setups.keySet()) {
+
             b.loadFromFen(bId);
             long startTime = System.currentTimeMillis();
-            Move bestMove = miniMaxAB.launch(b, 4);
-            System.out.println("(depth 4) Minmax w/ AB took: " + (System.currentTimeMillis() - startTime));
+            Move bestMove = miniMaxAB.launch(b, 5);
+
+            double timeTaken = (System.currentTimeMillis() - startTime);
+            System.out.println("Minmax w/ AB took: " + timeTaken);
+            sum += timeTaken;
+
             assertEquals(setups.get(bId), bestMove.toString());
         }
+        System.out.println("AVG time taken w/ depth 5: " + sum / setups.size());
     }
 
-    private void initializeSetups() {
+    /**
+     * Min depth 3 required
+     */
+    private void initializeDepth3Setups() {
         freeQueenSetup();
         checkMateSetup();
         freeQueenWithForkSetup();
         freeQueenWithDiscoverAttackSetup();
+        mateInTwoWithPromotionSetup();
+        royalForkSetup();
+    }
+
+    /**
+     * Min depth 5 required
+     */
+    private void initializeDepth5Setups() {
+        mateInThreeSetup();
+
     }
 
     //Setups
@@ -162,6 +185,29 @@ public class EvaluationTest {
         b.setPiece(Piece.BLACK_KING, Square.E5);
         setups.put(b.getFen(), "d3d5");
 
+    }
+
+    private void royalForkSetup() {
+        b.clear();
+        b.setPiece(Piece.WHITE_KING, Square.C5);
+        b.setPiece(Piece.WHITE_KNIGHT, Square.E4);
+        b.setPiece(Piece.BLACK_QUEEN, Square.H1);
+        b.setPiece(Piece.BLACK_KING, Square.H5);
+        setups.put(b.getFen(), "e4g3");
+
+    }
+
+    private void mateInThreeSetup() {
+        b.clear();
+        b.loadFromFen("r1b1kb1r/pppp1ppp/5q2/4n3/3KP3/2N3PN/PPP4P/R1BQ1B1R b kq");
+        setups.put(b.getFen(), "f8c5");
+    }
+
+    private void mateInTwoWithPromotionSetup() {
+        b.clear();
+        b.loadFromFen("1rb4r/pkPp3p/1b1P3n/1Q6/N3Pp2/8/P1P3PP/7K b");
+        b.setSideToMove(Side.WHITE);
+        setups.put(b.getFen(), "b5d5");
     }
 
 }
