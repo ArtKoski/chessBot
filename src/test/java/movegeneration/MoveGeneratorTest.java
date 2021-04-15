@@ -11,6 +11,8 @@ import com.github.bhlangonijr.chesslib.PieceType;
 import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
+import com.github.bhlangonijr.chesslib.move.MoveGenerator;
+import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
 import datastructureproject.BitOperations;
 import datastructureproject.MovesGenerator;
 import java.util.ArrayList;
@@ -382,11 +384,20 @@ public class MoveGeneratorTest {
     }
 
     //RANDOM
-    
-    public void generatingMovesIsNotTooSlow() {
+    @Test
+    public void generatingMovesIsNotTooSlow() throws MoveGeneratorException {
+        b.loadFromFen("r1b1kb1r/pppp1ppp/5q2/4n3/3KP3/2N3PN/PPP4P/R1BQ1B1R b kq");
         long startTime = System.currentTimeMillis();
-        gen.generateLegalMoves(b);
-        System.out.println("moveGen took: " + (System.currentTimeMillis() - startTime));
+        gen.generateLegalMoves(b, false);
+        long myTime = (System.currentTimeMillis() - startTime);
+
+        startTime = System.currentTimeMillis();
+        MoveGenerator.generateLegalMoves(b);
+        long chessLibTime = (System.currentTimeMillis() - startTime);
         
+        System.out.println(myTime + " vs " + chessLibTime);
+        
+        System.out.println("chessLib was " + ((1.0 * myTime) / (1.0 * chessLibTime)) + " times faster");
+
     }
 }

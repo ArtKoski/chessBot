@@ -114,7 +114,7 @@ public class BoardOperationsTest {
         b.setPiece(Piece.BLACK_KNIGHT, Square.D4);
         b.setPiece(Piece.BLACK_QUEEN, Square.F3);
         b.setSideToMove(Side.BLACK);
-        List<Move> asd = gen.generateLegalMoves(b);
+        List<Move> asd = gen.generateLegalMoves(b, true);
         System.out.println();
     }
 }

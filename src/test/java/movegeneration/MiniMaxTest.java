@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package movegeneration;
 
 import com.github.bhlangonijr.chesslib.Board;
@@ -12,8 +7,7 @@ import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
 import datastructureproject.BitOperations;
-import datastructureproject.Evaluation.BoardEvaluation;
-import datastructureproject.Evaluation.SimpleEvaluator;
+import datastructureproject.Evaluation.*;
 import datastructureproject.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +29,6 @@ public class MiniMaxTest {
     Board b;
     List<Move> moves;
     BitOperations bitboard;
-    BoardEvaluation eval;
     MiniMax miniMax;
     MiniMaxAB miniMaxAB;
 
@@ -49,7 +42,6 @@ public class MiniMaxTest {
         gen = new MovesGenerator();
         moves = new ArrayList<>();
         bitboard = new BitOperations();
-        eval = new SimpleEvaluator();
         miniMax = new MiniMax(b);
         miniMaxAB = new MiniMaxAB(b);
         setups = new HashMap<>();
@@ -75,20 +67,6 @@ public class MiniMaxTest {
     public void tearDown() {
     }
 
-    //SIMPLE EVAL
-    @Test
-    public void simpleEvaluationStart() {
-        int evalResult = eval.evaluateBoard(b);
-        assertEquals(0, evalResult);
-    }
-
-    @Test
-    public void simpleEvaluationWhiteDoesntHaveQueen() {
-        b.unsetPiece(Piece.WHITE_QUEEN, Square.D1);
-        int evalResult = eval.evaluateBoard(b);
-        assertEquals(-900, evalResult);
-    }
-
     //Normal MiniMax, with SimpleEval
     //@Test
     public void testAllSetups() {
@@ -102,18 +80,19 @@ public class MiniMaxTest {
         }
     }
 
-    //Alpha-Beta, with SimpleEval
+    //Alpha-Beta, with ComplexEval
     @Test
     public void testAllSetupsAB() {
         initializeDepth3Setups();
-        initializeDepth5Setups();
+        // initializeDepth5Setups();
 
+        int depth = 4;
         int sum = 0;
         for (String bId : setups.keySet()) {
 
             b.loadFromFen(bId);
             long startTime = System.currentTimeMillis();
-            Move bestMove = miniMaxAB.launch(b, 5);
+            Move bestMove = miniMaxAB.launch(b, depth);
 
             double timeTaken = (System.currentTimeMillis() - startTime);
             System.out.println("Minmax w/ AB took: " + timeTaken);
@@ -121,7 +100,7 @@ public class MiniMaxTest {
 
             assertEquals(setups.get(bId), bestMove.toString());
         }
-        System.out.println("AVG time taken w/ depth 5: " + sum / setups.size());
+        System.out.println("AVG time taken w/ depth " + depth + ": " + sum / setups.size());
     }
 
     /**
