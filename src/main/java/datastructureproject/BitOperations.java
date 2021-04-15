@@ -269,7 +269,7 @@ public class BitOperations {
      */
     public static long getPawnCaptures(Square square, Side side, long enemyPieces) {
         long pawnAttacks;
-        if (side.equals(Side.WHITE)) { //Tämän saa ? avulla nätisti
+        if (side.equals(Side.WHITE)) {
             pawnAttacks = whitePawnAttacks[square.ordinal()] & enemyPieces;
         } else {
             pawnAttacks = blackPawnAttacks[square.ordinal()] & enemyPieces;
@@ -463,7 +463,13 @@ public class BitOperations {
      * @return
      */
     public static long squareAttackedBy(Side enemySide, Board b, Square square) {
+
         long attacks = 0L;
+
+        if (square.ordinal() == 64) {
+            return attacks;
+        }
+        
         attacks |= (BitOperations.getPawnAttacks(enemySide.flip())[square.ordinal()]
                 & b.getBitboard(Piece.make(enemySide, PieceType.PAWN)));
         attacks |= (BitOperations.getKnightAttacks()[square.ordinal()]

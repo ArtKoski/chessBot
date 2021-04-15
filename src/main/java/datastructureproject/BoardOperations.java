@@ -53,7 +53,8 @@ public class BoardOperations {
         Square kingSquare = getKingSquare(tempBoard, tempBoard.getSideToMove());
         boolean isKingMove = (move.getTo() == kingSquare);
 
-        return !isKingChecked(tempBoard, kingSquare, isKingMove);
+        return !isKingAttacked(tempBoard);
+       // return !isKingChecked(tempBoard, kingSquare, isKingMove);
     }
 
     public static boolean isEnemyKingCheckedAfterMove(Move move, Board b) {

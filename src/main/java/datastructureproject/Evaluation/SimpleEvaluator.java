@@ -35,7 +35,6 @@ public class SimpleEvaluator implements BoardEvaluation {
      */
     @Override
     public int evaluateBoard(Board board) {
-        //System.out.println(evaluateSide(Side.WHITE, board) + " vs " + evaluateSide(Side.BLACK, board));
         return (evaluateSide(Side.WHITE, board) - evaluateSide(Side.BLACK, board));
     }
 
