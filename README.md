@@ -6,14 +6,17 @@ Tällä hetkellä kaikki tekemäni löytyy [datastructureproject:in alta](https:
 [Määrittelydokumentti](https://github.com/ArtKoski/chessBot/tree/master/documentation/tekoäly/Määrittelydokumentti.md)
 
 [Testausdokumentti](https://github.com/ArtKoski/chessBot/blob/master/documentation/teko%C3%A4ly/testausdokumentti.md)  
-  
+
+[Toteutusdokumentti](https://github.com/ArtKoski/chessBot/blob/master/documentation/teko%C3%A4ly/Toteutusdokumenttii.md) (NA) 
+
+
 [Viikkoraportti 1](https://github.com/ArtKoski/chessBot/tree/master/documentation/tekoäly/viikkoraportti1.md)  
   
 [Viikkoraportti 2](https://github.com/ArtKoski/chessBot/blob/master/documentation/tekoäly/viikkoraportti2.md)  
 
 [Viikkoraportti 3](https://github.com/ArtKoski/chessBot/blob/master/documentation/tekoäly/viikkoraportti3.md)  
 
-[Viikkoraportti 4](https://github.com/ArtKoski/chessBot/blob/master/documentation/tekoäly/viikkoraportti4.md) (NA)
+[Viikkoraportti 4](https://github.com/ArtKoski/chessBot/blob/master/documentation/tekoäly/viikkoraportti4.md)
 
 
 
