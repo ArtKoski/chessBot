@@ -38,7 +38,7 @@ public class MiniMax {
      */
     public Move launch(Board board, int depth) {
 
-        List<Move> moves = moveGenerator.generateLegalMoves(board);
+        List<Move> moves = moveGenerator.generateLegalMoves(board, true);
 
         Move bestMove = null;
 
@@ -83,7 +83,7 @@ public class MiniMax {
         }
 
         int lowestValue = Integer.MAX_VALUE;
-        for (Move move : moveGenerator.generateLegalMoves(board)) {
+        for (Move move : moveGenerator.generateLegalMoves(board, true)) {
             board.doMove(move);
             int enemysBestMove = max(board, (depth - 1));
             board.undoMove();
@@ -110,7 +110,7 @@ public class MiniMax {
         }
 
         int highestValue = Integer.MIN_VALUE;
-        for (Move move : moveGenerator.generateLegalMoves(board)) {
+        for (Move move : moveGenerator.generateLegalMoves(board, true)) {
             board.doMove(move);
             int enemysBestMove = min(board, (depth - 1));
             board.undoMove();

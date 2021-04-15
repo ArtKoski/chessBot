@@ -33,7 +33,7 @@ public class MovesGenerator {
      * @param b - current board
      * @return list of legal moves
      */
-    public LinkedList<Move> generateLegalMoves(Board b) {
+    public LinkedList<Move> generateLegalMoves(Board b, boolean sort) {
         moveList = new LinkedList();
         attacks = new LinkedList();
         long ownPieces = b.getBitboard(b.getSideToMove());
@@ -47,7 +47,7 @@ public class MovesGenerator {
         generateQueenMoves(b, moveList);
         //generateCastleMoves(b, moves);
 
-        filterMoveList(b);
+        filterMoveList(b, sort);
 
         return moveList;
     }
@@ -57,18 +57,19 @@ public class MovesGenerator {
      * captures, then the rest.
      *
      * @param b - current board
+     * @param sort - boolean for whether you want to sort the movelist or not
      */
-    public void filterMoveList(Board b) {
+    public void filterMoveList(Board b, boolean sort) {
         for (Iterator<Move> iterator = moveList.iterator(); iterator.hasNext();) {
             Move move = iterator.next();
             if (!BoardOperations.isMoveLegal(move, b)) {
                 iterator.remove();
                 continue;
             }
-            if (BoardOperations.isEnemyKingCheckedAfterMove(move, b)) {
+            if (BoardOperations.isEnemyKingCheckedAfterMove(move, b) && sort) {
                 attacks.addFirst(move);
                 iterator.remove();
-            } else if (BoardOperations.isMoveCapture(move, b)) {
+            } else if (BoardOperations.isMoveCapture(move, b) && sort) {
                 attacks.addLast(move);
             }
 
@@ -110,6 +111,7 @@ public class MovesGenerator {
 
     public void generateKingMoves(Board b, List<Move> moveList, long ownPieces) {
         long king = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.KING));
+
         int pieceIndex = BitOperations.bitScanForward(king);
         Square squareCurrent = Square.squareAt(pieceIndex);
         long moves = BitOperations.getKingMoves(squareCurrent, ownPieces);
@@ -121,6 +123,7 @@ public class MovesGenerator {
             moveList.add(newMove);
 
             moves = BitOperations.removeLSB(moves);
+
         }
     }
 

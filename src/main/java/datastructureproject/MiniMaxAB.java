@@ -35,7 +35,7 @@ public class MiniMaxAB {
         highestValue = Integer.MIN_VALUE;
         lowestValue = Integer.MAX_VALUE;
 
-        List<Move> moves = moveGenerator.generateLegalMoves(board);
+        List<Move> moves = moveGenerator.generateLegalMoves(board, true);
 
         Move bestMove = null;
 
@@ -78,7 +78,7 @@ public class MiniMaxAB {
         }
 
         int lowestCurrentValue = Integer.MAX_VALUE;
-        for (Move move : moveGenerator.generateLegalMoves(board)) {
+        for (Move move : moveGenerator.generateLegalMoves(board, true)) {
             board.doMove(move);
             int whitesBestMove = max(board, (depth - 1), alpha, beta);
             board.undoMove();
@@ -109,7 +109,7 @@ public class MiniMaxAB {
         }
 
         int highestCurrentValue = Integer.MIN_VALUE;
-        for (Move move : moveGenerator.generateLegalMoves(board)) {
+        for (Move move : moveGenerator.generateLegalMoves(board, true)) {
             board.doMove(move);
             int blacksBestMove = min(board, (depth - 1), alpha, beta);
             board.undoMove();
