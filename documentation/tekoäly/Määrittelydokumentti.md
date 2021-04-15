@@ -20,18 +20,14 @@ Järkevämmässä toteutuksessa on tarkoitus ottaa myös vähemmän ilmiselvät 
 - Sotilas syö toisen sotilaan, mutta nyt omat sotilaat ovat 'peräkkäin' -> ei välttämättä yhtä hyvä tilanne kuin että jos sotilaat olisivat vierekkäin
 - Hevonen siirtyy laudan reunalle -> mahdollisten siirtojen määrä vähenee, siis huonompi tilanne 
 
-Minimaxi arvioi kaikki mahdolliset tilanteet ja valitsee niistä parhaimman.
-Aloittelijakin kuitenkin näkee usein jopa parin siirron päähän, ja näin tekoälynkin pitäisi pystyä näkemään esim. ilmiselvät vaihtokaupat. Tullaan siis tarviamaan rekursiota, mikä kuuluukin minimaxin toimintaan.
-
-Tehokkuden kannalta kaikista olennaisinta on, että 'turhien' siirtojen laskemiseen ei käytetä aikaa. (Tähän tarkoitus käyttää 'alpha-beta pruning':ia)
-
-
 ## Minimax
 Minimax algoritmi käy läpi puuta, josta löytyy mahdolliset pelisiirrot ja niiden pistevaikutukset. Algoritmi etsii puusta ne siirrot, jotka tuottavat maksimaalisen/minimaalisen pistemäärän pelaajalle (maksimaalisen jos pelaa valkoisilla, ja minimaalisen jos mustilla).
 Algoritmin aikavaativuus on O(b^n), 
 ja tilavaativuus O(bn), jossa
 b = lailliset siirrot sekä
 n = puun syvyys
+
+Tehokkuden kannalta kaikista olennaisinta on, että 'turhien' siirtojen laskemiseen ei käytetä aikaa. (Tähän tarkoitus käyttää 'alpha-beta pruning':ia)
 
 ~~Epäselvää tällä hetkellä on:~~
 - ~~Onko tarkoitus tehdä shakin 'säännöt' omalla toteutuksella, vai saako valmista MoveGenerator.generateLegalMoves() käyttää, joka siis palauttaa kaikki lailliset siirrot. Jos tämä on tarkoitus itse koodata, niin oletan, että tämä tulee olemaan hyvin työläs osa projektia.~~
