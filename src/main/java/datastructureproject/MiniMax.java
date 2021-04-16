@@ -2,7 +2,6 @@ package datastructureproject;
 
 import datastructureproject.Evaluation.BoardEvaluation;
 import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.move.Move;
 import datastructureproject.Evaluation.*;
 import java.util.List;

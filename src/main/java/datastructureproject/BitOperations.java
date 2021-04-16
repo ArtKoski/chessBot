@@ -4,11 +4,8 @@ import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.Piece;
 import com.github.bhlangonijr.chesslib.PieceType;
 import com.github.bhlangonijr.chesslib.Rank;
-import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Provides some bitboard operations to solve the possible moves.
@@ -469,7 +466,7 @@ public class BitOperations {
         if (square.ordinal() == 64) {
             return attacks;
         }
-        
+
         attacks |= (BitOperations.getPawnAttacks(enemySide.flip())[square.ordinal()]
                 & b.getBitboard(Piece.make(enemySide, PieceType.PAWN)));
         attacks |= (BitOperations.getKnightAttacks()[square.ordinal()]

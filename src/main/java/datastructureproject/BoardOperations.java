@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package datastructureproject;
 
 import com.github.bhlangonijr.chesslib.Board;
@@ -15,7 +10,7 @@ import static datastructureproject.BitOperations.getKingSquare;
 import static datastructureproject.BitOperations.squareAttackedBy;
 
 /**
- *
+ * Board related methods. Often relies on chesslibs methods.
  *
  * @author artkoski
  */
@@ -54,7 +49,7 @@ public class BoardOperations {
         boolean isKingMove = (move.getTo() == kingSquare);
 
         return !isKingAttacked(tempBoard);
-       // return !isKingChecked(tempBoard, kingSquare, isKingMove);
+        // return !isKingChecked(tempBoard, kingSquare, isKingMove);
     }
 
     public static boolean isEnemyKingCheckedAfterMove(Move move, Board b) {
@@ -65,11 +60,10 @@ public class BoardOperations {
 
         return isKingAttacked(tempBoard);
     }
-    
-    
+
     public static boolean isMoveCapture(Move move, Board b) {
         return (move.getTo().getBitboard() & b.getBitboard()) != 0L;
-        
+
     }
 
     //Temporarily not own implementation in use.

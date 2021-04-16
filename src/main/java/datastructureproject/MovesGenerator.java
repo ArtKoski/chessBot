@@ -31,6 +31,8 @@ public class MovesGenerator {
      * moves, then filters out illegal moves, then sorts by 'checks'.
      *
      * @param b - current board
+     * @param sort - boolean passed on to filterMoveList
+     *
      * @return list of legal moves
      */
     public LinkedList<Move> generateLegalMoves(Board b, boolean sort) {

@@ -1,36 +1,26 @@
 package datastructureproject;
 
-import datastructureproject.Evaluation.BoardEvaluation;
 import chess.bot.ChessBot;
 import chess.engine.GameState;
 import com.github.bhlangonijr.chesslib.move.Move;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.github.bhlangonijr.chesslib.move.*;
-
 import java.util.Random;
-
 import com.github.bhlangonijr.chesslib.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
- * COPY OF TESTBOT FOR TESTING
+ * Copy of TestBot with miniMax in use.
  *
  * @author artkoski
  */
 public class TemporaryBot implements ChessBot {
 
-    private final Random random;
     private Board b;
-    private final MovesGenerator moveGenerator;
     private final MiniMaxAB miniMax;
 
     public TemporaryBot() {
-        this.random = new Random();
         this.b = new Board();
-        moveGenerator = new MovesGenerator();
         miniMax = new MiniMaxAB(b);
     }
 
@@ -66,7 +56,7 @@ public class TemporaryBot implements ChessBot {
      * @throws MoveGeneratorException if unable to generate legal moves
      */
     public Move getMove() throws MoveGeneratorException {
-       return null;
+        return null;
     }
 
     public Board getBoard() {
