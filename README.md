@@ -1,7 +1,12 @@
 [![codecov](https://codecov.io/gh/ArtKoski/chessBot/branch/master/graph/badge.svg?token=7OF4D55JQ9)](https://codecov.io/gh/ArtKoski/chessBot)
 
 
-Tällä hetkellä kaikki tekemäni löytyy [datastructureproject:in alta](https://github.com/ArtKoski/chessBot/tree/master/src/main/java/datastructureproject)
+Tällä hetkellä kaikki tekemäni löytyy [datastructureproject:in alta](https://github.com/ArtKoski/chessBot/tree/master/src/main/java/datastructureproject)  
+___________________
+Bottia voi simuloida ilman lichess-yhteyttä komennolla  
+``` ./gradlew PerformanceTest ```  
+Botti pelaa tällöin 'itseään vastaan', ja liikkeet tulostuu terminaaliin.  
+Kyseisellä luokalla on tarkoitus tehdä tehokkuustestejä myöhemmin.  
 
 _____________________
 
