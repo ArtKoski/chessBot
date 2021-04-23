@@ -26,5 +26,5 @@ _____________
 
 [Viikkoraportti 4](https://github.com/ArtKoski/chessBot/blob/master/documentation/tekoäly/viikkoraportti4.md)
 
-
+[Viikkoraportti 5](https://github.com/ArtKoski/chessBot/blob/master/documentation/teko%C3%A4ly/viikkoraportti5.md)
 
