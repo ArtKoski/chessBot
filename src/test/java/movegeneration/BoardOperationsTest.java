@@ -85,6 +85,14 @@ public class BoardOperationsTest {
         moves.add(new Move(Square.C3, Square.D2));    //Legal move
     }
 
+    //@Test
+    public void bugFixing() {
+        b.loadFromFen("r1b1kb1r/pppp1ppp/5q2/8/4P3/2NnK1PN/PPP4P/R1BQ1B1R b");
+        Move move = new Move(Square.F6, Square.D8);
+        assertMoveIsLegal(move, b);
+
+    }
+
     @Test
     public void isMoveLegal() {
         CheckTestingSetup();
@@ -92,6 +100,13 @@ public class BoardOperationsTest {
         moves.forEach((move) -> {
             assertMoveIsLegal(move, b);
         });
+    }
+
+    @Test
+    public void asssd() {
+        CheckTestingSetup();
+        moves = gen.generateLegalMoves(b, true);
+        System.out.println("moves: " + moves);
     }
 
     public static void assertMoveIsLegal(Move move, Board b) {

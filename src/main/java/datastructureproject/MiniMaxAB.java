@@ -18,8 +18,8 @@ public class MiniMaxAB {
     private MovesGenerator moveGenerator;
     private BoardEvaluation evaluator;
 
-    int highestValue = Integer.MIN_VALUE;
-    int lowestValue = Integer.MAX_VALUE;
+    int highestValue;
+    int lowestValue;
 
     public MiniMaxAB(Board b) {
         moveGenerator = new MovesGenerator();
@@ -73,21 +73,38 @@ public class MiniMaxAB {
      */
     public int min(Board board, int depth, int alpha, int beta) {
 
-        if (depth == 0 || BoardOperations.isGameOver(board)) {
+        if (BoardOperations.isGameOver(board)) {
+            return depth * 10000;
+        }
+
+        if (depth == 0/* || BoardOperations.isGameOver(board)*/) {
             return evaluator.evaluateBoard(board);
         }
 
         int lowestCurrentValue = Integer.MAX_VALUE;
         for (Move move : moveGenerator.generateLegalMoves(board, true)) {
-            board.doMove(move);
+            board.doMove(move, false);
             int whitesBestMove = max(board, (depth - 1), alpha, beta);
             board.undoMove();
 
+            if (whitesBestMove < lowestCurrentValue) {
+                lowestCurrentValue = whitesBestMove;
+            }
+
+            if (lowestCurrentValue < alpha) {
+                return lowestCurrentValue;
+            }
+
+            if (lowestCurrentValue < beta) {
+                beta = lowestCurrentValue;
+
+                /*
             lowestCurrentValue = Math.min(whitesBestMove, lowestCurrentValue);
 
             beta = Math.min(beta, whitesBestMove);
             if (beta <= alpha) {
                 return Integer.MIN_VALUE;
+            }*/
             }
         }
 
@@ -104,17 +121,36 @@ public class MiniMaxAB {
      * @return best score for white
      */
     public int max(Board board, int depth, int alpha, int beta) {
-        if (depth == 0 || BoardOperations.isGameOver(board)) {
+
+        if (BoardOperations.isGameOver(board)) {
+            return depth * -10000;
+        }
+
+        if (depth == 0/* || BoardOperations.isGameOver(board)*/) {
             return evaluator.evaluateBoard(board);
         }
 
         int highestCurrentValue = Integer.MIN_VALUE;
         for (Move move : moveGenerator.generateLegalMoves(board, true)) {
-            board.doMove(move);
+            board.doMove(move, false);
             int blacksBestMove = min(board, (depth - 1), alpha, beta);
             board.undoMove();
 
-            highestCurrentValue = Math.max(highestCurrentValue, blacksBestMove);
+            if (blacksBestMove > highestCurrentValue) {
+                highestCurrentValue = blacksBestMove;
+            }
+
+            if (highestCurrentValue > beta) {
+                return highestCurrentValue;
+            }
+
+            if (highestCurrentValue > alpha) {
+                alpha = highestCurrentValue;
+            }
+        }
+
+        /*
+        highestCurrentValue = Math.max(highestCurrentValue, blacksBestMove);
 
             alpha = Math.max(alpha, blacksBestMove);
             if (beta <= alpha) {
@@ -122,6 +158,7 @@ public class MiniMaxAB {
             }
         }
 
+         */
         return highestCurrentValue;
     }
 }

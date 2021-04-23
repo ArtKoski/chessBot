@@ -84,18 +84,18 @@ public class MiniMaxTest {
     @Test
     public void testAllSetupsAB() {
         initializeDepth3Setups();
-        // initializeDepth5Setups();
+         //initializeDepth5Setups();
 
-        int depth = 4;
+        int depth = 5;
         int sum = 0;
         for (String bId : setups.keySet()) {
-
+            
             b.loadFromFen(bId);
             long startTime = System.currentTimeMillis();
             Move bestMove = miniMaxAB.launch(b, depth);
 
             double timeTaken = (System.currentTimeMillis() - startTime);
-            System.out.println("Minmax w/ AB took: " + timeTaken);
+            System.out.println("Minmax w/ AB took: " + timeTaken + ", setup was: " + b.getBitboard());
             sum += timeTaken;
 
             assertEquals(setups.get(bId), bestMove.toString());

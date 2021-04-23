@@ -2,6 +2,7 @@ package datastructureproject.Evaluation;
 
 import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.Piece;
+import com.github.bhlangonijr.chesslib.PieceType;
 import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
 import datastructureproject.BitOperations;
@@ -15,8 +16,13 @@ import java.util.HashMap;
 public class SimpleEvaluator implements BoardEvaluation {
 
     HashMap<String, Integer> values;
+    HashMap<Integer, Integer> transpositionTable;
 
     public SimpleEvaluator() {
+        transpositionTable = new HashMap<>(10000);
+        for (int i = 0; i < 10000; i++) {
+            transpositionTable.put(i, null);
+        }
         values = new HashMap<>();
         values.put("PAWN", 100);
         values.put("KNIGHT", 300);
@@ -34,8 +40,14 @@ public class SimpleEvaluator implements BoardEvaluation {
      * @return evaluation
      */
     @Override
-    public int evaluateBoard(Board board) {
-        return (evaluateSide(Side.WHITE, board) - evaluateSide(Side.BLACK, board));
+    public int evaluateBoard(Board board) { //Zobrist stuff doesn't work properly 
+        int hashKey = (int) (board.getBitboard() % transpositionTable.keySet().size());
+        if (transpositionTable.get(hashKey) != null) {
+            return transpositionTable.get(hashKey);
+        }
+        int score = evaluateSide(Side.WHITE, board) - evaluateSide(Side.BLACK, board);
+        transpositionTable.put(hashKey, score);
+        return score;
     }
 
     /**
@@ -46,7 +58,7 @@ public class SimpleEvaluator implements BoardEvaluation {
      * @return evaluation
      */
     public int evaluateSide(Side side, Board board) {
-        return evaluateScore(side, board) + isCheckMate(side, board);
+        return evaluateScore(side, board);
     }
 
     /**
@@ -72,10 +84,11 @@ public class SimpleEvaluator implements BoardEvaluation {
 
     }
 
-    public int isCheckMate(Side side, Board b) {
+    public boolean isCheckMate(Side side, Board b) {
         Board opponentsPOV = b.clone();
         opponentsPOV.setSideToMove(side.flip());
-        return BoardOperations.isCheckMate(opponentsPOV) ? 10000 : 0;
+        return BoardOperations.isCheckMate(b);
+        //return BoardOperations.isCheckMate(opponentsPOV) ? 10000 : 0;
     }
 
 }

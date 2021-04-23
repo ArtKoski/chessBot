@@ -76,7 +76,7 @@ public class EvaluationTest {
 
     //COMPLEX EVAL
     @Test
-    public void mobilityTest() {
+    public void centerKnightBetterThanOnEdge() {
         cornerKnightSetup();
         int cornerKnightEval = complexEval.evaluateBoard(b);
 
@@ -110,6 +110,36 @@ public class EvaluationTest {
         b.setPiece(Piece.WHITE_KNIGHT, Square.D4);
         b.setPiece(Piece.WHITE_KING, Square.B2);
         b.setPiece(Piece.BLACK_KING, Square.H8);
+    }
+
+    @Test
+    public void centerPawnBetterThanOnEdge() {
+        b.clear();
+        b.setPiece(Piece.BLACK_KING, Square.D8);
+        b.setPiece(Piece.WHITE_KING, Square.E1);
+        b.setPiece(Piece.WHITE_PAWN, Square.E4);
+        int centerPawn = complexEval.evaluateBoard(b);
+
+        b.clear();
+        b.setPiece(Piece.BLACK_KING, Square.D8);
+        b.setPiece(Piece.WHITE_KING, Square.E1);
+        b.setPiece(Piece.WHITE_PAWN, Square.H4);
+        int edgePawn = complexEval.evaluateBoard(b);
+
+        assertTrue(centerPawn > edgePawn);
+    }
+
+    @Test
+    public void pawnTableWorksForBothSides() {
+        int beginningEval = complexEval.evaluateBoard(b);
+        b.doMove(new Move(Square.D7, Square.D5));
+        int blackPawnToCenterEval = complexEval.evaluateBoard(b);
+        b.undoMove();
+        b.doMove(new Move(Square.E2, Square.E4));
+        int whitePawnToCenterEval = complexEval.evaluateBoard(b);
+
+        assertTrue(blackPawnToCenterEval < beginningEval);
+        assertTrue(whitePawnToCenterEval > beginningEval);
     }
 
 }

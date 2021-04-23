@@ -13,6 +13,7 @@ import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.move.MoveGenerator;
 import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
+import com.github.bhlangonijr.chesslib.move.MoveList;
 import datastructureproject.BitOperations;
 import datastructureproject.MovesGenerator;
 import java.util.ArrayList;
@@ -327,6 +328,7 @@ public class MoveGeneratorTest {
         gen.generateBishopMoves(b, moves);
 
         assertEquals(9, moves.size());
+
     }
 
     @Test
@@ -368,6 +370,19 @@ public class MoveGeneratorTest {
         assertEquals(8, moves.size());
     }
 
+    @Test
+    public void kingCantBeCaptured() {
+        b.clear();
+        b.setPiece(Piece.WHITE_KING, Square.D2);
+        b.setPiece(Piece.BLACK_PAWN, Square.C3);
+        b.setSideToMove(Side.BLACK);
+
+        gen.generatePawnMoves(b, moves);
+        assertEquals(1, moves.size());
+        assertFalse(moves.get(0).toString().equals("c3d2"));
+
+    }
+
     //QUEEN - essentially just combines rook and bishop, no need for indepth testing
     @Test
     public void queenMovesStart() {
@@ -384,7 +399,19 @@ public class MoveGeneratorTest {
     }
 
     //RANDOM
-    @Test
+    //@Test
+    public void moveFilterWorksProperly() {
+        b.clear();
+        b.setPiece(Piece.WHITE_KING, Square.B5);
+        b.setPiece(Piece.WHITE_QUEEN, Square.A1);
+        b.setPiece(Piece.BLACK_QUEEN, Square.H1);
+        b.setPiece(Piece.BLACK_KING, Square.G5);
+
+        moves = gen.generateLegalMoves(b, true);
+        //System.out.println(moves);
+    }
+
+    //@Test
     public void generatingMovesIsNotTooSlow() throws MoveGeneratorException {
         b.loadFromFen("r1b1kb1r/pppp1ppp/5q2/4n3/3KP3/2N3PN/PPP4P/R1BQ1B1R b kq");
         long startTime = System.currentTimeMillis();
@@ -394,9 +421,9 @@ public class MoveGeneratorTest {
         startTime = System.currentTimeMillis();
         MoveGenerator.generateLegalMoves(b);
         long chessLibTime = (System.currentTimeMillis() - startTime);
-        
+
         System.out.println(myTime + " vs " + chessLibTime);
-        
+
         System.out.println("chessLib was " + ((1.0 * myTime) / (1.0 * chessLibTime)) + " times faster");
 
     }

@@ -50,7 +50,7 @@ public class BitOperations {
     static {
         Square current;
         long currentBB;
-        for (int x = 0; x <= 63; x++) {
+        for (int x = 0; x <= 62; x++) {
             current = Square.squareAt(x);
             currentBB = current.getBitboard();
 
@@ -67,7 +67,7 @@ public class BitOperations {
                     | ((currentBB & rank[6]) >> 16);
         }
         blackPawnAttacks[63] = 0x0040000000000000L;
-        blackPawnMoves[63] = 0x0080000000000000L;   //sq 64 weirdness 
+        blackPawnMoves[63] = 0x0080000000000000L;   //sq 64 overflow
     }
 
     /**
@@ -231,25 +231,20 @@ public class BitOperations {
      */
     public static long getPawnMoves(Square square, Side side, long occupied) {
         long pawnMoves;
+        long squareBB = square.getBitboard();
+        long squareInFront;
         if (side.equals(Side.WHITE)) {
-            if (square.getRank().equals(Rank.RANK_2)) {
-                long squareInFront = square.getBitboard() << 8;     //Bit shift to get the square in front of pawn
-                long pieceInFront = squareInFront & occupied;       //AND op. to see if that square has any pieces on it
-                if (pieceInFront != 0L) {                           //If 1, then there is a piece blocking
-                    return 0L;
-                }
+            squareInFront = squareBB << 8;                      //Bit shift to get the square in front of pawn
+            if ((squareInFront & occupied) != 0L) {             //If 1, then there is a piece blocking
+                return 0L;
             }
             pawnMoves = whitePawnMoves[square.ordinal()] & ~occupied;
+
         } else {
-            if (square.getRank().equals(Rank.RANK_7)) {
-                long squareInFront = square.getBitboard() >> 8;
-                long pieceInFront = squareInFront & occupied;
-                if (pieceInFront != 0L) {
-                    return 0L;
-
-                }
+            squareInFront = squareBB >> 8;
+            if ((squareInFront & occupied) != 0L) {
+                return 0L;
             }
-
             pawnMoves = blackPawnMoves[square.ordinal()] & ~occupied;
         }
 
@@ -265,40 +260,37 @@ public class BitOperations {
      * @return pseudolegal pawn attacks (as bitboard)
      */
     public static long getPawnCaptures(Square square, Side side, long enemyPieces) {
-        long pawnAttacks;
-        if (side.equals(Side.WHITE)) {
-            pawnAttacks = whitePawnAttacks[square.ordinal()] & enemyPieces;
-        } else {
-            pawnAttacks = blackPawnAttacks[square.ordinal()] & enemyPieces;
-        }
+        return side.equals(Side.WHITE) ? whitePawnAttacks[square.ordinal()] & enemyPieces
+                : blackPawnAttacks[square.ordinal()] & enemyPieces;
+    }
 
-        return pawnAttacks;
+    public static long getBishopMoves(Square square, long occupied, long friendlyPieces) {
+        long pseudoAttacks = getLineAttacks(square.getBitboard(), occupied, (bishopRays[0][square.ordinal()] | bishopRays[2][square.ordinal()]))
+                | getLineAttacks(square.getBitboard(), occupied, (bishopRays[1][square.ordinal()] | bishopRays[3][square.ordinal()]));
+        return pseudoAttacks & friendlyPieces;
+    }
+
+    public static long getRookMoves(Square square, long occupied, long friendlyPieces) {
+        long pseudoAttacks = getLineAttacks(square.getBitboard(), occupied, (rookRays[1][square.ordinal()] | rookRays[3][square.ordinal()]))
+                | getLineAttacks(square.getBitboard(), occupied, (rookRays[0][square.ordinal()] | rookRays[2][square.ordinal()]));
+        return pseudoAttacks & friendlyPieces;
     }
 
     /**
-     * Goes through all the directions (NE,SW,NW,SE) and uses masks and
-     * forward/reverse scan to figure out bishops possible attack squares.
+     * Used for calculating 'sliding' piece attacks. (rooks, bishops, queen).
+     * Based on 'Hyperbola Quintessence'.
+     * https://www.chessprogramming.org/Hyperbola_Quintessence
      *
-     * @param square - of the bishop
-     * @param occupied - bitboard representing occupied squares
-     * @return pseudolegal bishop attacks (as bitboard)
+     * @param currSquare - current square (bitboard)
+     * @param occupied - occupied squares (bitboard)
+     * @param mask - horizontal, vertical, or left/right diagonal
+     * @return line attacks (bitboard)
      */
-    public static long getBishopMoves(Square square, long occupied) {
-        long bishopAttacks = 0L;
-        int occupierIndex;
-        for (int i = 0; i < 4; i++) {
-            bishopAttacks |= bishopRays[i][square.ordinal()];
-            if ((bishopRays[i][square.ordinal()] & occupied) != 0L) {
-                if (i < 2) {
-                    occupierIndex = bitScanForward((bishopRays[i][square.ordinal()] & occupied));
-                } else {
-                    occupierIndex = bitScanReverse((bishopRays[i][square.ordinal()] & occupied));
-                }
-                bishopAttacks &= ~bishopRays[i][occupierIndex];                 //Leave out squares after the blocker
-
-            }
-        }
-        return bishopAttacks;
+    public static long getLineAttacks(long currSquare, long occupied, long mask) {
+        long left = ((occupied & mask) - 2 * currSquare);
+        long right = Long.reverse(Long.reverse(occupied & mask) - 2 * Long.reverse(currSquare));
+        long possibleLine = (left ^ right) & mask;
+        return possibleLine;
     }
 
     /**
@@ -344,33 +336,6 @@ public class BitOperations {
             square = nextSquare;
         }
         return bishopAttacks;
-    }
-
-    /**
-     * Goes through all the directions (N,E,S,W) and uses masks and
-     * forward/reverse scan to figure out rooks possible attack squares.
-     *
-     * @param square - current square
-     * @param occupied - bitboard representation of occupied squares
-     * @return pseudolegal rook attacks (as bitboard)
-     */
-    public static long getRookMoves(Square square, long occupied) {
-        long rookAttacks = 0L;
-        int occupierIndex;
-        for (int i = 0; i < 4; i++) {
-            rookAttacks |= rookRays[i][square.ordinal()];
-            if ((rookRays[i][square.ordinal()] & occupied) != 0L) {
-                if (i < 2) {
-                    occupierIndex = bitScanForward((rookRays[i][square.ordinal()] & occupied));
-                } else {
-                    occupierIndex = bitScanReverse((rookRays[i][square.ordinal()] & occupied));
-                }
-                rookAttacks &= ~rookRays[i][occupierIndex];
-
-            }
-        }
-        return rookAttacks;
-
     }
 
     /**
@@ -426,8 +391,8 @@ public class BitOperations {
      * @param occupied - bitboard representation of occupied squares
      * @return
      */
-    public static long getQueenMoves(Square square, long occupied) {
-        return (getBishopMoves(square, occupied) | getRookMoves(square, occupied));
+    public static long getQueenMoves(Square square, long occupied, long friendlyPieces) {
+        return (getBishopMoves(square, occupied, friendlyPieces) | getRookMoves(square, occupied, friendlyPieces));
     }
 
     /**
@@ -473,10 +438,10 @@ public class BitOperations {
                 & b.getBitboard(Piece.make(enemySide, PieceType.KNIGHT)));
         attacks |= (BitOperations.getAdjacentSquares()[square.ordinal()]
                 & b.getBitboard(Piece.make(enemySide, PieceType.KING)));
-        attacks |= (BitOperations.getBishopMoves(square, b.getBitboard())
+        attacks |= (BitOperations.getBishopMoves(square, b.getBitboard(), ~b.getBitboard(b.getSideToMove())))
                 & (b.getBitboard(Piece.make(enemySide, PieceType.BISHOP))
-                | b.getBitboard(Piece.make(enemySide, PieceType.QUEEN))));
-        attacks |= (BitOperations.getRookMoves(square, b.getBitboard())
+                | b.getBitboard(Piece.make(enemySide, PieceType.QUEEN)));
+        attacks |= (BitOperations.getRookMoves(square, b.getBitboard(), ~b.getBitboard(b.getSideToMove()))
                 & (b.getBitboard(Piece.make(enemySide, PieceType.ROOK))
                 | b.getBitboard(Piece.make(enemySide, PieceType.QUEEN))));
 

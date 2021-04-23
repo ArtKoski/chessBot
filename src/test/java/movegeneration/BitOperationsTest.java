@@ -182,6 +182,7 @@ public class BitOperationsTest {
         b.setPiece(Piece.BLACK_KNIGHT, Square.G5);
         long attacks = BitOperations.squareAttackedBy(Side.BLACK, b, Square.E4);
         assertEquals(0x47000005000L, attacks);
+
     }
 
     //@Test ray generation not tested atm. dunno if needed

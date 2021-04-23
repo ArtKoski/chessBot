@@ -8,6 +8,9 @@ import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
 import static datastructureproject.BitOperations.getKingSquare;
 import static datastructureproject.BitOperations.squareAttackedBy;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Board related methods. Often relies on chesslibs methods.
@@ -15,6 +18,19 @@ import static datastructureproject.BitOperations.squareAttackedBy;
  * @author artkoski
  */
 public class BoardOperations {
+
+    static final HashMap<String, Integer> values = new HashMap<>();
+
+    static {
+        values.put("PAWN", 100);
+        values.put("KNIGHT", 300);
+        values.put("BISHOP", 300);
+        values.put("ROOK", 500);
+        values.put("QUEEN", 900);
+        values.put("NONE", 0);
+        values.put("KING", 10000);
+
+    }
 
     /**
      * Used for realizing a move on a temporary board to find out if it is legal
@@ -24,6 +40,7 @@ public class BoardOperations {
      * @param b - current board
      */
     public static void pseudoMove(Move move, Board b) {
+
         Square from = move.getFrom();
         Square to = move.getTo();
         if (!b.getPiece(to).value().equals("NONE")) {
@@ -43,13 +60,12 @@ public class BoardOperations {
      */
     public static boolean isMoveLegal(Move move, Board b) {
         Board tempBoard = b.clone();
-
         pseudoMove(move, tempBoard);
         Square kingSquare = getKingSquare(tempBoard, tempBoard.getSideToMove());
         boolean isKingMove = (move.getTo() == kingSquare);
 
         return !isKingAttacked(tempBoard);
-        // return !isKingChecked(tempBoard, kingSquare, isKingMove);
+        //return !isKingChecked(tempBoard, kingSquare, isKingMove);
     }
 
     public static boolean isEnemyKingCheckedAfterMove(Move move, Board b) {
@@ -61,6 +77,32 @@ public class BoardOperations {
         return isKingAttacked(tempBoard);
     }
 
+    //Some experimental stuff
+    public static boolean isEnemyKingCheckedAfterMoveTEST(Move move, Board b) {
+        Board tempBoard = b.clone();
+
+        pseudoMove(move, tempBoard);
+        tempBoard.setSideToMove(b.getSideToMove().flip());
+
+        return (isKingAttacked(tempBoard) && (squareAttackedBy(b.getSideToMove().flip(), b, move.getTo()) == 0L));
+
+    }
+
+    public static boolean compareCurrentSquareToDestination(Move move, Board b) {
+        Square squareCurrent = move.getFrom();
+        Square squareDestination = move.getTo();
+
+        Piece piece1 = b.getPiece(squareCurrent);
+        Piece piece2 = b.getPiece(squareDestination);
+
+        if (piece2.value().equals("NONE")) {
+            return false;
+        }
+
+        return (values.getOrDefault(piece1.getPieceType().toString(), 0) < values.getOrDefault(piece2.getPieceType().toString(), 0));
+
+    }
+
     public static boolean isMoveCapture(Move move, Board b) {
         return (move.getTo().getBitboard() & b.getBitboard()) != 0L;
 
@@ -68,10 +110,10 @@ public class BoardOperations {
 
     //Temporarily not own implementation in use.
     public static boolean isCheckMate(Board b) {
-        return b.isMated();
-        /*    MovesGenerator generator = new MovesGenerator();
-        return generator.generateLegalMoves(b).isEmpty() && isKingAttacked(b);
-         */
+        //return b.isMated();
+
+        MovesGenerator generator = new MovesGenerator();
+        return generator.generateLegalMoves(b, false).isEmpty() && (isKingAttacked(b));
     }
 
     /**
@@ -101,33 +143,27 @@ public class BoardOperations {
 
         Side enemySide = b.getSideToMove().flip();
         long allPieces = b.getBitboard();
+        long ownPieces = ~b.getBitboard(b.getSideToMove());
 
         long enemyRooks = b.getBitboard(Piece.make(enemySide, PieceType.ROOK));
         long enemyBishops = b.getBitboard(Piece.make(enemySide, PieceType.BISHOP));
         long enemyQueens = b.getBitboard(Piece.make(enemySide, PieceType.QUEEN));
 
-        /*
         if (isKingMove) {
-            if (squareAttackedBy(enemySide, b, square) != 0) {
-                return true;
-            }
-        }*/
-        if (isKingAttacked(b)) {
+            return isKingAttacked(b);
+        }
+        if ((enemyRooks & BitOperations.getRookMoves(square, allPieces, ownPieces) | (enemyQueens & BitOperations.getQueenMoves(square, allPieces, ownPieces))) != 0L) {  //Open file/rank between rook and king
             return true;
         }
 
-        /*
-        if ((enemyRooks & getRookMoves(square, allPieces)) != 0L) {  //Open file/rank between rook and king
+        if ((enemyBishops & BitOperations.getBishopMoves(square, allPieces, ownPieces) | (enemyQueens & BitOperations.getQueenMoves(square, allPieces, ownPieces))) != 0L) {  //Open diagonal between bishop and king
             return true;
         }
 
-        if ((enemyBishops & getBishopMoves(square, allPieces)) != 0L) {  //Open diagonal between bishop and king
+        if ((enemyQueens & BitOperations.getQueenMoves(square, allPieces, ownPieces)) != 0L) {  //Open file/rank/diagonal between queen and king
             return true;
-        }
 
-        if ((enemyQueens & getQueenMoves(square, allPieces)) != 0L) {  //Open file/rank/diagonal between queen and king
-            return true;
-        }*/
+        }
         return false;
     }
 
