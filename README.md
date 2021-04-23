@@ -5,7 +5,7 @@ Tällä hetkellä kaikki tekemäni löytyy [datastructureproject:in alta](https:
 ___________________
 Bottia voi simuloida ilman lichess-yhteyttä komennolla  
 ``` ./gradlew run PerformanceTest ```  
-Botti pelaa tällöin 'itseään vastaan', ja liikkeet tulostuu terminaaliin.  
+Botti pelaa tällöin 'itseään vastaan', ja liikkeet tulostuu terminaaliin (Voi nopeuttaa datastructurebot.TemporaryBot.java riviltä 38 laittamalla toiseksi argumentiksi numeron 3).  
 Kyseisellä luokalla on tarkoitus tehdä tehokkuustestejä myöhemmin.  
 
 _____________________
