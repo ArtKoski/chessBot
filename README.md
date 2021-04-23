@@ -4,7 +4,7 @@
 Tällä hetkellä kaikki tekemäni löytyy [datastructureproject:in alta](https://github.com/ArtKoski/chessBot/tree/master/src/main/java/datastructureproject)  
 ___________________
 Bottia voi simuloida ilman lichess-yhteyttä komennolla  
-``` ./gradlew PerformanceTest ```  
+``` ./gradlew run PerformanceTest ```  
 Botti pelaa tällöin 'itseään vastaan', ja liikkeet tulostuu terminaaliin.  
 Kyseisellä luokalla on tarkoitus tehdä tehokkuustestejä myöhemmin.  
 
