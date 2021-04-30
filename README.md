@@ -14,7 +14,7 @@ _____________________
 
 [Testausdokumentti](https://github.com/ArtKoski/chessBot/blob/master/documentation/teko%C3%A4ly/Testausdokumentti.md)  
 
-[Toteutusdokumentti](https://github.com/ArtKoski/chessBot/blob/master/documentation/teko%C3%A4ly/Toteutusdokumentti.md) (NA) 
+[Toteutusdokumentti](https://github.com/ArtKoski/chessBot/blob/master/documentation/teko%C3%A4ly/Toteutusdokumentti.md)
 
 _____________
 
