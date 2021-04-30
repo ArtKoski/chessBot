@@ -20,7 +20,7 @@ Tässä joitain tämänhetkisiä tehokkuustuloksia.
 | **Syvyys 4**| | **Paras tulos** |
 | Helpot Puzzlet  (avg) | > 1 min| 1.5 s | -
 | Vaihtelu (s) | [30 ; 120] s | [0.7 ; 3.7] s | -   
-|Testit läpi | Kyllä | Kyllä | Ei.. |
+|Testit läpi | Kyllä | Kyllä | Ei.. * |
 |**Syvyys 5** | | | **Paras tulos**
 | Helpot Puzzlet (avg) | Hyvin pitkään | 8.5 s | 3.7 s
 | Vaihtelu | Suurta| [2 ; 30] s | [1 ; 15]  |
@@ -38,6 +38,7 @@ Yhteenvetona tuloksista voi sanoa, että algoritmi laskee pulmat melko tehokkaas
 ### Bugs & Problems
 - Ruutu 64 bitboard esityksenä tekee long-muuttujan ylivuodon. (ainakin oman analyysin perustella). Tästä johtuen valmiiksi laskettujen liikelistojen viimeinen ruutu on aina 'kovakoodattu'.
 - BoardOperations.isMoveLegal -metodi ei toimi halutulla metodilla (aiheuttaa bugin jota en ole saanut korjattua). Sen sijaan käytössä on epätehokkaampi versio.
+- Toteutukseni Zobrist Hashing:ista on hyvin alkeellinen. Useissa tilanteissa se siis saattaa johtaa siihen, että objektiivisesti parasta siirtoa ei löydetäkkään. 
 
 ### Lähteitä
 ['Liukuvien' hyökkäysten](https://www.chessprogramming.org/Hyperbola_Quintessence) laskemiseen käytetty temppu.
