@@ -34,9 +34,12 @@ public class TemporaryBot implements ChessBot {
 
         Move myMove;
         try {
-            //Generate a chesslib move based on the position
-            myMove = this.miniMax.launch(b, 4);
+            if (gs.getMoveCount() < 10) {
+                myMove = this.miniMax.launch(b, 4);
+            } else {
+                myMove = this.miniMax.launch(b, 4);
 
+            }
             if (myMove != null) {
                 //Transform the move into a UCI string representation
                 return myMove.toString();

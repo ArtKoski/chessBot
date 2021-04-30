@@ -4,6 +4,7 @@ import datastructureproject.Evaluation.BoardEvaluation;
 import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.move.Move;
 import datastructureproject.Evaluation.*;
+import datastructureproject.lists.MoveList;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ public class MiniMax {
 
     public MiniMax(Board b) {
         moveGenerator = new MovesGenerator();
-        evaluator = new SimpleEvaluator();
+        evaluator = new ComplexEvaluator();
     }
 
     private boolean isWhiteTurn(Board board) {
@@ -37,7 +38,7 @@ public class MiniMax {
      */
     public Move launch(Board board, int depth) {
 
-        List<Move> moves = moveGenerator.generateLegalMoves(board, true);
+        MoveList moves = moveGenerator.generateLegalMoves(board, true);
 
         Move bestMove = null;
 
@@ -77,7 +78,11 @@ public class MiniMax {
      */
     public int min(Board board, int depth) {
 
-        if (depth == 0 || BoardOperations.isCheckMate(board)) {
+        if (BoardOperations.isGameOver(board)) {
+            return depth * 10000;
+        }
+
+        if (depth == 0) {
             return evaluator.evaluateBoard(board);
         }
 
@@ -86,7 +91,7 @@ public class MiniMax {
             board.doMove(move);
             int enemysBestMove = max(board, (depth - 1));
             board.undoMove();
-            if (enemysBestMove <= lowestValue) {
+            if (enemysBestMove < lowestValue) {
                 lowestValue = enemysBestMove;
             }
 
@@ -104,7 +109,11 @@ public class MiniMax {
      * @return current branch evaluation
      */
     public int max(Board board, int depth) {
-        if (depth == 0 || BoardOperations.isCheckMate(board)) {
+
+        if (BoardOperations.isGameOver(board)) {
+            return depth * -10000;
+        }
+        if (depth == 0) {
             return evaluator.evaluateBoard(board);
         }
 
@@ -113,7 +122,7 @@ public class MiniMax {
             board.doMove(move);
             int enemysBestMove = min(board, (depth - 1));
             board.undoMove();
-            if (enemysBestMove >= highestValue) {
+            if (enemysBestMove > highestValue) {
                 highestValue = enemysBestMove;
             }
 

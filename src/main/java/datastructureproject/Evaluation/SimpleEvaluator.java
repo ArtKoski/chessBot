@@ -16,13 +16,8 @@ import java.util.HashMap;
 public class SimpleEvaluator implements BoardEvaluation {
 
     HashMap<String, Integer> values;
-    HashMap<Integer, Integer> transpositionTable;
 
     public SimpleEvaluator() {
-        transpositionTable = new HashMap<>(10000);
-        for (int i = 0; i < 10000; i++) {
-            transpositionTable.put(i, null);
-        }
         values = new HashMap<>();
         values.put("PAWN", 100);
         values.put("KNIGHT", 300);
@@ -40,13 +35,8 @@ public class SimpleEvaluator implements BoardEvaluation {
      * @return evaluation
      */
     @Override
-    public int evaluateBoard(Board board) { //Zobrist stuff doesn't work properly 
-        int hashKey = (int) (board.getBitboard() % transpositionTable.keySet().size());
-        if (transpositionTable.get(hashKey) != null) {
-            return transpositionTable.get(hashKey);
-        }
+    public int evaluateBoard(Board board) {
         int score = evaluateSide(Side.WHITE, board) - evaluateSide(Side.BLACK, board);
-        transpositionTable.put(hashKey, score);
         return score;
     }
 
@@ -84,11 +74,11 @@ public class SimpleEvaluator implements BoardEvaluation {
 
     }
 
+    //Not used atm
     public boolean isCheckMate(Side side, Board b) {
         Board opponentsPOV = b.clone();
         opponentsPOV.setSideToMove(side.flip());
         return BoardOperations.isCheckMate(b);
-        //return BoardOperations.isCheckMate(opponentsPOV) ? 10000 : 0;
     }
 
 }

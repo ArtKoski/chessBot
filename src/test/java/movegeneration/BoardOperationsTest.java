@@ -12,6 +12,7 @@ import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
 import datastructureproject.BoardOperations;
 import datastructureproject.MovesGenerator;
+import datastructureproject.lists.MoveList;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
@@ -28,13 +29,13 @@ import static org.junit.Assert.*;
 public class BoardOperationsTest {
 
     Board b;
-    List<Move> moves;
+    MoveList moves;
     MovesGenerator gen;
 
     public BoardOperationsTest() {
         b = new Board();
         gen = new MovesGenerator();
-        moves = new ArrayList<>();
+        moves = new MoveList();
 
     }
 
@@ -129,7 +130,7 @@ public class BoardOperationsTest {
         b.setPiece(Piece.BLACK_KNIGHT, Square.D4);
         b.setPiece(Piece.BLACK_QUEEN, Square.F3);
         b.setSideToMove(Side.BLACK);
-        List<Move> asd = gen.generateLegalMoves(b, true);
+        MoveList asd = gen.generateLegalMoves(b, true);
         System.out.println();
     }
 }

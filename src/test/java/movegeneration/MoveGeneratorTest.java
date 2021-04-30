@@ -13,9 +13,10 @@ import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.move.MoveGenerator;
 import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
-import com.github.bhlangonijr.chesslib.move.MoveList;
+
 import datastructureproject.BitOperations;
 import datastructureproject.MovesGenerator;
+import datastructureproject.lists.MoveList;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
@@ -33,13 +34,13 @@ public class MoveGeneratorTest {
 
     MovesGenerator gen;
     Board b;
-    List<Move> moves;
+    MoveList moves;
     BitOperations bitboard;
 
     public MoveGeneratorTest() {
         b = new Board();
         gen = new MovesGenerator();
-        moves = new ArrayList<>();
+        moves = new MoveList();
         bitboard = new BitOperations();
 
     }

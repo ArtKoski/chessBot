@@ -5,13 +5,10 @@ import com.github.bhlangonijr.chesslib.Piece;
 import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
-import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
 import datastructureproject.BitOperations;
-import datastructureproject.Evaluation.*;
 import datastructureproject.*;
-import java.util.ArrayList;
+import datastructureproject.lists.MoveList;
 import java.util.HashMap;
-import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -27,10 +24,11 @@ public class MiniMaxTest {
 
     MovesGenerator gen;
     Board b;
-    List<Move> moves;
+    MoveList moves;
     BitOperations bitboard;
     MiniMax miniMax;
     MiniMaxAB miniMaxAB;
+    MiniMaxABZobrist miniMaxZobrist = new MiniMaxABZobrist(b);
 
     /*
     First String is FEN notation as an ID, second String is the best (expected) play.
@@ -40,7 +38,7 @@ public class MiniMaxTest {
     public MiniMaxTest() {
         b = new Board();
         gen = new MovesGenerator();
-        moves = new ArrayList<>();
+        moves = new MoveList();
         bitboard = new BitOperations();
         miniMax = new MiniMax(b);
         miniMaxAB = new MiniMaxAB(b);
@@ -71,31 +69,61 @@ public class MiniMaxTest {
     //@Test
     public void testAllSetups() {
         initializeDepth3Setups();
+
+        int depth = 4;
+        int sum = 0;
         for (String bId : setups.keySet()) {
             b.loadFromFen(bId);
             long startTime = System.currentTimeMillis();
-            Move bestMove = miniMax.launch(b, 3);
-            System.out.println("(depth 3) Minmax took: " + (System.currentTimeMillis() - startTime));
+            Move bestMove = miniMax.launch(b, depth);
+            long timeTaken = (System.currentTimeMillis() - startTime);
+            System.out.println("(depth 3) Minmax took: " + timeTaken);
+            sum += timeTaken;
             assertEquals(setups.get(bId), bestMove.toString());
         }
+
+        System.out.println("AVG time taken w/ depth " + depth + ": " + sum / setups.size());
     }
 
     //Alpha-Beta, with ComplexEval
-    @Test
+    //@Test
     public void testAllSetupsAB() {
         initializeDepth3Setups();
-         //initializeDepth5Setups();
+        //initializeDepth5Setups();
 
         int depth = 5;
         int sum = 0;
         for (String bId : setups.keySet()) {
-            
+
             b.loadFromFen(bId);
             long startTime = System.currentTimeMillis();
             Move bestMove = miniMaxAB.launch(b, depth);
 
             double timeTaken = (System.currentTimeMillis() - startTime);
             System.out.println("Minmax w/ AB took: " + timeTaken + ", setup was: " + b.getBitboard());
+            sum += timeTaken;
+
+            assertEquals(setups.get(bId), bestMove.toString());
+        }
+        System.out.println("AVG time taken w/ depth " + depth + ": " + sum / setups.size());
+    }
+
+    //Alpha-Beta, with ComplexEval and Zobrist
+    @Test
+    public void testAllSetupsABZobrist() {
+        initializeDepth3Setups();
+        //initializeDepth5Setups();
+
+        int depth = 5;
+        int sum = 0;
+        for (String bId : setups.keySet()) {
+
+            b.loadFromFen(bId);
+            long startTime = System.currentTimeMillis();
+            Move bestMove = miniMaxZobrist.launch(b, depth);
+
+            double timeTaken = (System.currentTimeMillis() - startTime);
+            System.out.println("Minmax w/ AB&Zobrist took: " + timeTaken + ", setup was: " + b.getBitboard());
             sum += timeTaken;
 
             assertEquals(setups.get(bId), bestMove.toString());

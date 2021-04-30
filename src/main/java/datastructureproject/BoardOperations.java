@@ -9,11 +9,10 @@ import com.github.bhlangonijr.chesslib.move.Move;
 import static datastructureproject.BitOperations.getKingSquare;
 import static datastructureproject.BitOperations.squareAttackedBy;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
 
 /**
- * Board related methods. Often relies on chesslibs methods.
+ * Board related methods. Often relies on chesslibs methods. 
+ * The class is a little messy.
  *
  * @author artkoski
  */
@@ -64,6 +63,7 @@ public class BoardOperations {
         Square kingSquare = getKingSquare(tempBoard, tempBoard.getSideToMove());
         boolean isKingMove = (move.getTo() == kingSquare);
 
+        //System.out.println("move is " + move + " and board: " + tempBoard.getBitboard());
         return !isKingAttacked(tempBoard);
         //return !isKingChecked(tempBoard, kingSquare, isKingMove);
     }
@@ -108,10 +108,7 @@ public class BoardOperations {
 
     }
 
-    //Temporarily not own implementation in use.
     public static boolean isCheckMate(Board b) {
-        //return b.isMated();
-
         MovesGenerator generator = new MovesGenerator();
         return generator.generateLegalMoves(b, false).isEmpty() && (isKingAttacked(b));
     }
@@ -143,7 +140,7 @@ public class BoardOperations {
 
         Side enemySide = b.getSideToMove().flip();
         long allPieces = b.getBitboard();
-        long ownPieces = ~b.getBitboard(b.getSideToMove());
+        long ownPieces = b.getBitboard(b.getSideToMove());
 
         long enemyRooks = b.getBitboard(Piece.make(enemySide, PieceType.ROOK));
         long enemyBishops = b.getBitboard(Piece.make(enemySide, PieceType.BISHOP));
@@ -152,18 +149,19 @@ public class BoardOperations {
         if (isKingMove) {
             return isKingAttacked(b);
         }
+        System.out.println("asd");
         if ((enemyRooks & BitOperations.getRookMoves(square, allPieces, ownPieces) | (enemyQueens & BitOperations.getQueenMoves(square, allPieces, ownPieces))) != 0L) {  //Open file/rank between rook and king
             return true;
         }
-
+        System.out.println("asd");
         if ((enemyBishops & BitOperations.getBishopMoves(square, allPieces, ownPieces) | (enemyQueens & BitOperations.getQueenMoves(square, allPieces, ownPieces))) != 0L) {  //Open diagonal between bishop and king
             return true;
         }
 
-        if ((enemyQueens & BitOperations.getQueenMoves(square, allPieces, ownPieces)) != 0L) {  //Open file/rank/diagonal between queen and king
+        /*if ((enemyQueens & BitOperations.getQueenMoves(square, allPieces, ownPieces)) != 0L) {  //Open file/rank/diagonal between queen and king
             return true;
 
-        }
+        }*/
         return false;
     }
 

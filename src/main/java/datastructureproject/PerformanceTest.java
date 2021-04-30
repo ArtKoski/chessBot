@@ -32,26 +32,27 @@ public class PerformanceTest {
     }
 
     /**
-     * ATM just testing how long the first five moves take.
-     * @param args 
+     * ATM just testing how long the first 5-15 moves take.
+     *
+     * @param args
      */
     public static void main(String[] args) {
         newGame();
         GameState cur;
-        
+        int turns = 10;
 
-        for (int i = 0; i<5; i++) {
+        for (int i = 0; i < turns; i++) {
 
             long startTime = System.currentTimeMillis();
             String move = bot.nextMove(gsList.get(gsList.size() - 1));
             long timeTaken = System.currentTimeMillis() - startTime;
             System.out.println("time:" + timeTaken);
-            timeEval+=timeTaken;
-/*
+            timeEval += timeTaken;
+            /*
             startTime = System.currentTimeMillis();
             String move2 = bot2.nextMove(gsList.get(gsList.size() - 1));
             times(timeTaken, System.currentTimeMillis() - startTime);
-*/
+             */
             cur = new GameState();
             cur.moves.addAll((gsList.get(gsList.size() - 1)).moves);
             cur.moves.add(move);
@@ -59,7 +60,7 @@ public class PerformanceTest {
 
             System.out.println("latest move: " + move);
         }
-        System.out.println("tot: "+timeEval);
+        System.out.println("tot: " + timeEval + ", avg: " + (timeEval / turns));
 
     }
 }

@@ -7,13 +7,17 @@ package movegeneration;
 
 import com.github.bhlangonijr.chesslib.Board;
 import com.github.bhlangonijr.chesslib.Piece;
+import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
 import datastructureproject.BitOperations;
 import datastructureproject.Evaluation.BoardEvaluation;
 import datastructureproject.Evaluation.ComplexEvaluator;
+import datastructureproject.Evaluation.ComplexEvaluator;
 import datastructureproject.Evaluation.SimpleEvaluator;
+import datastructureproject.Evaluation.Zobrist;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -32,6 +36,7 @@ public class EvaluationTest {
     BitOperations bitboard;
     BoardEvaluation simpleEval;
     BoardEvaluation complexEval;
+    ComplexEvaluator complexEvalTEST;
     Board b;
 
     public EvaluationTest() {
@@ -39,6 +44,7 @@ public class EvaluationTest {
         bitboard = new BitOperations();
         simpleEval = new SimpleEvaluator();
         complexEval = new ComplexEvaluator();
+        complexEvalTEST = new ComplexEvaluator();
         b = new Board();
 
     }
@@ -130,16 +136,45 @@ public class EvaluationTest {
     }
 
     @Test
-    public void pawnTableWorksForBothSides() {
-        int beginningEval = complexEval.evaluateBoard(b);
-        b.doMove(new Move(Square.D7, Square.D5));
-        int blackPawnToCenterEval = complexEval.evaluateBoard(b);
-        b.undoMove();
-        b.doMove(new Move(Square.E2, Square.E4));
-        int whitePawnToCenterEval = complexEval.evaluateBoard(b);
+    public void pawnTableCenterPawnValues() {
+        //Center pawns
+        assertTrue(complexEvalTEST.getPawnBonus(Side.WHITE, Square.E4.ordinal()) == 25);
+        assertTrue(complexEvalTEST.getPawnBonus(Side.WHITE, Square.D4.ordinal()) == 25);
+        assertTrue(complexEvalTEST.getPawnBonus(Side.BLACK, Square.E5.ordinal()) == 25);
+        assertTrue(complexEvalTEST.getPawnBonus(Side.BLACK, Square.D5.ordinal()) == 25);
+    }
 
-        assertTrue(blackPawnToCenterEval < beginningEval);
-        assertTrue(whitePawnToCenterEval > beginningEval);
+    @Test
+    public void ZobristXORworksForHash() {
+        long start = Zobrist.getKeyForBoard(b);
+        long moveForward = Zobrist.getKeyForMove(new Move(Square.E2, Square.E4), b);
+
+        long newPosition = start ^ moveForward;
+        assertTrue(newPosition != start);
+
+        newPosition ^= moveForward;
+        assertTrue(newPosition == start);
+    }
+
+    @Test
+    public void ZobristTranspositionTable() {
+        int startScore = 0;
+        int scoreAfterE2E4 = 5;
+        long startHash = Zobrist.getKeyForBoard(b);
+        Zobrist.updateHash(startHash, startScore);
+
+        b.doMove(new Move(Square.E2, Square.E4));
+        long hashE2E4 = Zobrist.getKeyForBoard(b);
+        Zobrist.updateHash(hashE2E4, scoreAfterE2E4);
+
+        assertTrue(Zobrist.getScoreFromHash(startHash) == startScore);
+        assertTrue(Zobrist.getScoreFromHash(hashE2E4) == scoreAfterE2E4);
+    }
+
+    //@Test
+    public void asd() {
+        int evaluate = 10;
+
     }
 
 }

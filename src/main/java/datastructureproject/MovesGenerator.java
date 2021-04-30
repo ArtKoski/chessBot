@@ -1,16 +1,18 @@
 package datastructureproject;
 
 import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.CastleRight;
 import com.github.bhlangonijr.chesslib.Piece;
 import com.github.bhlangonijr.chesslib.PieceType;
 import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.move.MoveGenerator;
-import com.github.bhlangonijr.chesslib.move.MoveList;
+//import com.github.bhlangonijr.chesslib.move.MoveList;
 import java.util.Iterator;
-import java.util.LinkedList;
+//import java.util.LinkedList;
+//import datastructureproject.lists.LinkedList;
+import datastructureproject.lists.MoveList;
+//import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -20,12 +22,12 @@ import java.util.List;
 public class MovesGenerator {
 
     BitOperations bitboard;
-    LinkedList<Move> moveList;
-    LinkedList<Move> attacks;
+    MoveList moveList;
+    MoveList attacks;
 
     public MovesGenerator() {
         bitboard = new BitOperations();
-        moveList = new LinkedList();
+        moveList = new MoveList();
     }
 
     /**
@@ -37,9 +39,9 @@ public class MovesGenerator {
      *
      * @return list of legal moves
      */
-    public LinkedList<Move> generateLegalMoves(Board b, boolean sort) {
-        moveList = new LinkedList();
-        attacks = new LinkedList();
+    public MoveList generateLegalMoves(Board b, boolean sort) {
+        moveList = new MoveList();
+        attacks = new MoveList();
         long ownPieces = b.getBitboard(b.getSideToMove());
 
         generatePawnMoves(b, moveList);
@@ -50,12 +52,8 @@ public class MovesGenerator {
         generatePawnCaptures(b, moveList);
         generateKingMoves(b, moveList, ownPieces);
 
-        if (b.getMoveCounter() < 4) {
-            filterMoveList(b, false);
-        } else {
-            filterMoveList(b, sort);
+        filterMoveList(b, sort);
 
-        }
         return moveList;
     }
 
@@ -67,8 +65,11 @@ public class MovesGenerator {
      * @param sort - boolean for whether you want to sort the movelist or not
      */
     public void filterMoveList(Board b, boolean sort) {
+        Move move;
+        int i = 1;
         for (Iterator<Move> iterator = moveList.iterator(); iterator.hasNext();) {
-            Move move = iterator.next();
+            move = iterator.next();
+            i++;
             if (!BoardOperations.isMoveLegal(move, b)) {
                 iterator.remove();
                 continue;
@@ -84,6 +85,7 @@ public class MovesGenerator {
         }
         attacks.addAll(moveList);
         moveList = attacks;
+
     }
 
     /**
@@ -97,7 +99,7 @@ public class MovesGenerator {
      * @param moveList - list of moves
      * @param ownPieces - bitboard of own pieces for filtering
      */
-    public void generateKnightMoves(Board b, List<Move> moveList, long ownPieces) {
+    public void generateKnightMoves(Board b, MoveList moveList, long ownPieces) {
         long knights = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.KNIGHT));
 
         while (knights != 0L) {
@@ -117,7 +119,7 @@ public class MovesGenerator {
         }
     }
 
-    public void generateKingMoves(Board b, List<Move> moveList, long ownPieces) {
+    public void generateKingMoves(Board b, MoveList moveList, long ownPieces) {
         long king = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.KING));
 
         int pieceIndex = BitOperations.bitScanForward(king);
@@ -135,31 +137,7 @@ public class MovesGenerator {
         }
     }
 
-    //COPY PASTA FROM CHESSLIB FOR TIME BEING == NOT OWN IMPLEMENTATION!!!
-    public void generateCastleMoves(Board board, List<Move> moves) {
-        Side side = board.getSideToMove();
-        if (board.isKingAttacked()) {
-            return;
-        }
-        if (board.getCastleRight(side).equals(CastleRight.KING_AND_QUEEN_SIDE)
-                || (board.getCastleRight(side).equals(CastleRight.KING_SIDE))) {
-            if ((board.getBitboard() & board.getContext().getooAllSquaresBb(side)) == 0L) {
-                if (!board.isSquareAttackedBy(board.getContext().getooSquares(side), side.flip())) {
-                    moves.add(board.getContext().getoo(side));
-                }
-            }
-        }
-        if (board.getCastleRight(side).equals(CastleRight.KING_AND_QUEEN_SIDE)
-                || (board.getCastleRight(side).equals(CastleRight.QUEEN_SIDE))) {
-            if ((board.getBitboard() & board.getContext().getoooAllSquaresBb(side)) == 0L) {
-                if (!board.isSquareAttackedBy(board.getContext().getoooSquares(side), side.flip())) {
-                    moves.add(board.getContext().getooo(side));
-                }
-            }
-        }
-    }
-
-    public void generatePawnMoves(Board b, List<Move> moveList) {
+    public void generatePawnMoves(Board b, MoveList moveList) {
         long pawns = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.PAWN));
 
         while (pawns != 0L) {
@@ -179,7 +157,7 @@ public class MovesGenerator {
 
     }
 
-    public void generatePawnCaptures(Board b, List<Move> moveList) {
+    public void generatePawnCaptures(Board b, MoveList moveList) {
         long enemyPieces = b.getBitboard(b.getSideToMove().flip());
         long pawns = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.PAWN));
 
@@ -199,7 +177,7 @@ public class MovesGenerator {
 
     }
 
-    public void addPawnMoves(Square squareTarget, Square squareCurrent, Side side, List<Move> moves) {
+    public void addPawnMoves(Square squareTarget, Square squareCurrent, Side side, MoveList moves) {
         long targetBB = squareTarget.getBitboard();
         if (side.equals(Side.WHITE) && (targetBB & BitOperations.rank[7]) != 0L) {
             moves.add(new Move(squareCurrent, squareTarget, Piece.WHITE_KNIGHT));
@@ -217,7 +195,7 @@ public class MovesGenerator {
         }
     }
 
-    public void generateRookMoves(Board b, List<Move> moveList) {
+    public void generateRookMoves(Board b, MoveList moveList) {
         long rooks = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.ROOK));
 
         while (rooks != 0L) {
@@ -239,7 +217,7 @@ public class MovesGenerator {
 
     }
 
-    public void generateBishopMoves(Board b, List<Move> moveList) {
+    public void generateBishopMoves(Board b, MoveList moveList) {
         long bishops = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.BISHOP));
 
         while (bishops != 0L) {
@@ -261,7 +239,7 @@ public class MovesGenerator {
 
     }
 
-    public void generateQueenMoves(Board b, List<Move> moveList) {
+    public void generateQueenMoves(Board b, MoveList moveList) {
         long queens = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.QUEEN));
 
         while (queens != 0L) {

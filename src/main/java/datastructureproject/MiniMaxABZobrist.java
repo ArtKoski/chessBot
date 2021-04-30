@@ -6,24 +6,25 @@ import com.github.bhlangonijr.chesslib.move.Move;
 import datastructureproject.Evaluation.*;
 import datastructureproject.lists.LinkedList;
 import datastructureproject.lists.MoveList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
- * MiniMax with Alpha-Beta pruning. Otherwise works like regular MiniMax class,
- * but now min/max -method calls carry on alpha and beta parameters, which can
- * be used to figure out if future branches can be left uncalculated altogether.
+ * MiniMax with Alpha-Beta pruning and Zobrist Hashing. Alpha & Beta parameters
+ * are used to leave out unpromising branches uncalculated, whereas Zobrist
+ * Hashing is used so that the same position won't be calulated twice.
  *
  * @author artkoski
  */
-public class MiniMaxAB {
+public class MiniMaxABZobrist {
 
     private MovesGenerator moveGenerator;
-    private BoardEvaluation evaluator;
+    private ComplexEvaluator evaluator;
 
     int highestValue;
     int lowestValue;
 
-    public MiniMaxAB(Board b) {
+    public MiniMaxABZobrist(Board b) {
         moveGenerator = new MovesGenerator();
         evaluator = new ComplexEvaluator();
     }
@@ -42,20 +43,22 @@ public class MiniMaxAB {
         Move bestMove = null;
 
         int currentValue;
-        Board tempBoard = board.clone();
+        long zobristHash = Zobrist.getKeyForBoard(board);
 
         for (Move move : moves) {
-            tempBoard.doMove(move);
-            currentValue = (isWhiteTurn(tempBoard))
-                    ? max(tempBoard, (depth - 1), highestValue, lowestValue)
-                    : min(tempBoard, (depth - 1), highestValue, lowestValue);
-            tempBoard.undoMove();
+            long newHash = Zobrist.getKeyForMove(move, board) ^ zobristHash;
 
-            if (isWhiteTurn(tempBoard) && currentValue >= highestValue) {
+            board.doMove(move);
+            currentValue = (isWhiteTurn(board))
+                    ? max(board, (depth - 1), highestValue, lowestValue, newHash)
+                    : min(board, (depth - 1), highestValue, lowestValue, newHash);
+            board.undoMove();
+
+            if (isWhiteTurn(board) && currentValue >= highestValue) {
                 highestValue = currentValue;
                 bestMove = move;
 
-            } else if (!isWhiteTurn(tempBoard) && currentValue <= lowestValue) {
+            } else if (!isWhiteTurn(board) && currentValue <= lowestValue) {
                 lowestValue = currentValue;
                 bestMove = move;
             }
@@ -71,22 +74,25 @@ public class MiniMaxAB {
      * @param depth - current depth
      * @param alpha - current MINIMUM score
      * @param beta - current MAXIMUM score
+     * @param hash - current board hash value
      * @return best score for black
      */
-    public int min(Board board, int depth, int alpha, int beta) {
-
-        if (BoardOperations.isGameOver(board)) {
+    public int min(Board board, int depth, int alpha, int beta, long hash) {
+        MoveList moves = moveGenerator.generateLegalMoves(board, true);
+        if (moves.isEmpty() && BoardOperations.isGameOver(board)) {
             return depth * 10000;
         }
 
-        if (depth == 0/* || BoardOperations.isGameOver(board)*/) {
-            return evaluator.evaluateBoard(board);
+        if (depth == 0) {
+            return evaluator.evaluateBoard(board, hash, true);
         }
 
         int lowestCurrentValue = Integer.MAX_VALUE;
-        for (Move move : moveGenerator.generateLegalMoves(board, true)) {
+        for (Move move : moves) {
+            long newHash = Zobrist.getKeyForMove(move, board) ^ hash;
+
             board.doMove(move, false);
-            int whitesBestMove = max(board, (depth - 1), alpha, beta);
+            int whitesBestMove = max(board, (depth - 1), alpha, beta, newHash);
             board.undoMove();
 
             if (whitesBestMove < lowestCurrentValue) {
@@ -120,22 +126,25 @@ public class MiniMaxAB {
      * @param depth - current depth
      * @param alpha - current MINIMUM
      * @param beta - current MAXIMUM
+     * @param hash - current board hash value
      * @return best score for white
      */
-    public int max(Board board, int depth, int alpha, int beta) {
-
-        if (BoardOperations.isGameOver(board)) {
+    public int max(Board board, int depth, int alpha, int beta, long hash) {
+        MoveList moves = moveGenerator.generateLegalMoves(board, true);
+        if (moves.isEmpty() && BoardOperations.isGameOver(board)) {
             return depth * -10000;
         }
 
         if (depth == 0/* || BoardOperations.isGameOver(board)*/) {
-            return evaluator.evaluateBoard(board);
+            return evaluator.evaluateBoard(board, hash, true);
         }
 
         int highestCurrentValue = Integer.MIN_VALUE;
         for (Move move : moveGenerator.generateLegalMoves(board, true)) {
+            long newHash = Zobrist.getKeyForMove(move, board) ^ hash;
+
             board.doMove(move, false);
-            int blacksBestMove = min(board, (depth - 1), alpha, beta);
+            int blacksBestMove = min(board, (depth - 1), alpha, beta, newHash);
             board.undoMove();
 
             if (blacksBestMove > highestCurrentValue) {
