@@ -20,7 +20,7 @@ Tässä joitain tämänhetkisiä tehokkuustuloksia.
 | **Syvyys 4**| | **Paras tulos** |
 | Helpot Puzzlet  (avg) | > 1 min| 1.5 s | -
 | Vaihtelu (s) | [30 ; 120] s | [0.7 ; 3.7] s | -   
-|Testit läpi | Kyllä | Kyllä | Ei.. * |
+|Testit läpi | Kyllä | Kyllä | Ei..  |
 |**Syvyys 5** | | | **Paras tulos**
 | Helpot Puzzlet (avg) | Hyvin pitkään | 8.5 s | 3.7 s
 | Vaihtelu | Suurta| [2 ; 30] s | [1 ; 15]  |
