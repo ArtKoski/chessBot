@@ -10,7 +10,7 @@ Kyseisellä luokalla on tarkoitus tehdä tehokkuustestejä myöhemmin.
 
 _____________________
 
-[Määrittelydokumentti](https://github.com/ArtKoski/chessBot/blob/master/documentation/teko%C%A4ly/Määrittelydokumentti.md)
+[Määrittelydokumentti](https://github.com/ArtKoski/chessBot/blob/306b9cdf73cc64abe262886b437bddcbfec0235a/documentation/teko%C3%A4ly/M%C3%A4%C3%A4rittelydokumentti.md)
 
 [Testausdokumentti](https://github.com/ArtKoski/chessBot/blob/master/documentation/teko%C3%A4ly/Testausdokumentti.md)  
 
@@ -27,4 +27,7 @@ _____________
 [Viikkoraportti 4](https://github.com/ArtKoski/chessBot/blob/master/documentation/tekoäly/viikkoraportti4.md)
 
 [Viikkoraportti 5](https://github.com/ArtKoski/chessBot/blob/master/documentation/teko%C3%A4ly/viikkoraportti5.md)
+
+[Viikkoraportti 6](https://github.com/ArtKoski/chessBot/blob/master/documentation/teko%C3%A4ly/viikkoraportti6.md)
+
 
