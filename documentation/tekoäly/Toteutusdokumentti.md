@@ -12,7 +12,7 @@ Näistä viimeiseen *en* ole itse tehnyt luokkia, vaan käyttänyt chessLibia, m
 ---------------
 
 
-
+## Tehokkuustestejä
 Tässä joitain tämänhetkisiä tehokkuustuloksia.
 
 | |   MiniMax (SimpleEval) | MiniMax w/ AB Pruning | MiniMax w/ AB & Zobrist Hashing |
@@ -32,6 +32,8 @@ Tässä joitain tämänhetkisiä tehokkuustuloksia.
 | Pelin alku (avg) | > 15s | 3 s | 2.6 s
 |**Syvyys 4** | | |**Paras tulos**
 | Pelin alku (avg) | Kauan | > 30 s | 16 s
+
+Yhteenvetona tuloksista voi sanoa, että algoritmi laskee pulmat melko tehokkaasti, sillä niissä 'check' on yleensä voittava siirto. Normaaleissa pelitilanteissa kuitenkin (kuten pelin alussa) jo syvyydellä 4 joudutaan odottamaan epämieluisan pitkään.    
 
 ### Bugs & Problems
 - Ruutu 64 bitboard esityksenä tekee long-muuttujan ylivuodon. (ainakin oman analyysin perustella). Tästä johtuen valmiiksi laskettujen liikelistojen viimeinen ruutu on aina 'kovakoodattu'.
