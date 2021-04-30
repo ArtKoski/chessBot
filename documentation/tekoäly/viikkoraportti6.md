@@ -7,5 +7,5 @@
 | 29.4 | Zobrist Hashingiin testit. Tuntuu toimivan. Paransin myös Evaluator -luokkaa. | 5
 | | Jatkoin linkedlistin omaa toteutusta, mutta en saa iteraattoria toimimaan halutulla tavalla.|
 | | Aloitin tekemään omia toteutuksia luokista: Piece, Side, PieceType, Square. Ajattelin tämän olevan turhaa työtä, mutta yllätyksekseni tämä virkisti hyvin muistia Enum-luokkien käytöstä. Työläin luokka lienee Board. |
-| 30.4 | Tehokkuustestien tekemistä ja kirjaamista. | 3
-
+| 30.4 | Tehokkuustestien tekemistä ja kirjaamista. | 3.5
+| | | total: ~20 tuntia
