@@ -130,7 +130,7 @@ public class Board implements Cloneable {
     /**
      * Makes a move on the board. Assumes that move is legal.
      *
-     * @param move
+     * @param move - the move to be realized
      */
     public void doMove(Move move) {
         history.addFirst(move);
@@ -201,8 +201,8 @@ public class Board implements Cloneable {
     /**
      * Set a piece on a specific square. No checking for legality etc.
      *
-     * @param piece
-     * @param square
+     * @param piece - piece to set
+     * @param square - square to set the piece on
      */
     public void setPiece(Piece piece, Square square) {
         pieces[square.ordinal()] = piece;
@@ -220,8 +220,8 @@ public class Board implements Cloneable {
      * Unset a piece on a specific square. Assumes that the piece exists before
      * removing.
      *
-     * @param piece
-     * @param square
+     * @param piece - piece to unset
+     * @param square - square to unset the piece on
      */
     public void unsetPiece(Piece piece, Square square) {
         pieces[square.ordinal()] = Piece.makeNone();

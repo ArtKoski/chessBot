@@ -93,3 +93,7 @@ jar {
     }
 }
 
+javadoc {
+    exclude 'chess/**'
+}
+

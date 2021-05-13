@@ -5,7 +5,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import datastructureproject.Board.*;
 import datastructureproject.MiniMaxAB;
-import datastructureproject.MiniMaxAB;
 
 /**
  * Copy of TestBot with miniMax in use.
@@ -50,15 +49,6 @@ public class BlunderBot implements ChessBot {
         return null;
     }
 
-    /**
-     * Fetches a random move based on current board state
-     *
-     * @return A chesslib move
-     * @throws MoveGeneratorException if unable to generate legal moves
-     */
-    /*public Move getMove() throws MoveGeneratorException {
-        return null;
-    }*/
     public Board getBoard() {
         return this.b;
     }

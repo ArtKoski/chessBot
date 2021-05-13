@@ -35,7 +35,7 @@ public class Move extends Object {
     /**
      * Copy paste from chesslib
      *
-     * @return
+     * @return move as string (e.g e2e4)
      */
     @Override
     public String toString() {

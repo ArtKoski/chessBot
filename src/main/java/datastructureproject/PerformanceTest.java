@@ -33,7 +33,7 @@ public class PerformanceTest {
     /**
      * Testing how long the first x moves take.
      *
-     * @param args
+     * @param args - 
      */
     public static void main(String[] args) {
         newGame();

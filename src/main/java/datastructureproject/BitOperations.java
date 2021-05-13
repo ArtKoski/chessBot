@@ -357,7 +357,7 @@ public class BitOperations {
      * @param square - of the piece
      * @param occupied - all pieces (bitboard)
      * @param availableSquares - complement of friendly pieces bitboard
-     * @return
+     * @return pseudolegal bishop moves
      */
     public static long getBishopMoves(Square square, long occupied, long availableSquares) {
         long pseudoAttacks = getLineAttacks(square.getSquareBB(), occupied, (bishopRays[0][square.ordinal()] | bishopRays[2][square.ordinal()]))
@@ -372,7 +372,7 @@ public class BitOperations {
      * @param square - of the piece
      * @param occupied - all pieces (bitboard)
      * @param availableSquares - complement of friendly pieces bitboard
-     * @return
+     * @return pseudolegal rook moves
      */
     public static long getRookMoves(Square square, long occupied, long availableSquares) {
         long pseudoAttacks = getLineAttacks(square.getSquareBB(), occupied, (rookRays[1][square.ordinal()] | rookRays[3][square.ordinal()]))
@@ -403,7 +403,7 @@ public class BitOperations {
      * @param square - current square
      * @param occupied - bitboard representation of occupied squares
      * @param availableSquares - complement of friendly pieces bitboard
-     * @return
+     * @return pseudolegal queen moves
      */
     public static long getQueenMoves(Square square, long occupied, long availableSquares) {
         return (getBishopMoves(square, occupied, availableSquares) | getRookMoves(square, occupied, availableSquares));
@@ -436,7 +436,7 @@ public class BitOperations {
      * @param enemySide - white or black
      * @param b - current board (can be in illegal state)
      * @param square - current square
-     * @return
+     * @return attacks as a bitboard
      */
     public static long squareAttackedBy(Side enemySide, Board b, Square square) {
         long friendlyPieces = b.getBitboard(enemySide.flip());
@@ -470,8 +470,8 @@ public class BitOperations {
      * Results in removing the rightmost ('least significant') bit. Used for
      * iterating through pieces on a bitboard.
      *
-     * @param bitboard
-     * @return
+     * @param bitboard - current bitboard
+     * @return bitboard with the least significant bit removed
      */
     public static long removeLSB(long bitboard) {
         return bitboard & (bitboard - 1);
@@ -483,7 +483,7 @@ public class BitOperations {
      *
      * Utilizes javas own Long.numberOfTrailingZeros
      *
-     * @param bitboard
+     * @param bitboard - current bitboard
      * @return index of the first one-bit (rightmost = 'lowest' index in
      * bitboard)
      */
@@ -497,7 +497,7 @@ public class BitOperations {
      *
      * Utilizes javas own Long.numberOfLeadingZeros
      *
-     * @param bitboard
+     * @param bitboard - current bitboard
      * @return index of the first one-bit (leftmost = 'highest' index in
      * bitboard)
      */
