@@ -1,6 +1,5 @@
 package datastructureproject.Board;
 
-import datastructureproject.lists.MoveList;
 import datastructureproject.lists.LinkedList;
 
 /**
@@ -29,7 +28,7 @@ public class Board implements Cloneable {
      * Piece.WHITE_ROOK', that means there is a white rook on square A1.
      */
     private final Piece[] pieces;
-    private MoveList history;
+    private LinkedList<Move> history;
     private LinkedList<Piece> pieceHistory;
     private LinkedList<Piece> targetPieceHistory;
 
@@ -38,7 +37,7 @@ public class Board implements Cloneable {
      */
     public Board() {
         pieces = new Piece[64];
-        history = new MoveList();
+        history = new LinkedList<>();
         pieceHistory = new LinkedList<>();
         targetPieceHistory = new LinkedList<>();
 

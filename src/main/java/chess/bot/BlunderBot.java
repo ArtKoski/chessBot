@@ -1,22 +1,22 @@
-package datastructureproject;
+package chess.bot;
 
-import chess.bot.ChessBot;
 import chess.engine.GameState;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import datastructureproject.Board.*;
+import datastructureproject.MiniMaxAB;
 
 /**
  * Copy of TestBot with miniMax in use.
  *
  * @author artkoski
  */
-public class TemporaryBot implements ChessBot {
+public class BlunderBot implements ChessBot {
 
     private Board b;
     private final MiniMaxAB miniMax;
 
-    public TemporaryBot() {
+    public BlunderBot() {
         this.b = new Board();
         miniMax = new MiniMaxAB(b);
     }
@@ -43,7 +43,7 @@ public class TemporaryBot implements ChessBot {
             }
 
         } catch (Exception ex) {
-            Logger.getLogger(TemporaryBot.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BlunderBot.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return null;

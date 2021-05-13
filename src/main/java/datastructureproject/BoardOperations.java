@@ -20,19 +20,10 @@ public class BoardOperations {
      */
     public static boolean isMoveLegal(Move move, Board b) {
         Board tempBoard = b.clone();
-        Piece movingPiece = b.getPiece(move.getFrom());
 
         tempBoard.doMove(move);
-        Square kingSquare = getKingSquare(tempBoard, tempBoard.getSideToMove().flip());
-        if (kingSquare == Square.NONE) {
-            return true;
-        }
 
-        boolean isKingMove = ((movingPiece == Piece.BLACK_KING) || (movingPiece == Piece.WHITE_KING));
-
-        boolean kingAttacked = isKingAttacked(tempBoard);
-        return !kingAttacked;
-        //   return !isKingChecked(tempBoard, kingSquare, isKingMove);
+        return !isKingAttacked(tempBoard);
     }
 
     public static boolean isEnemyKingCheckedAfterMove(Move move, Board b) {
@@ -71,34 +62,4 @@ public class BoardOperations {
         return squareAttackedBy(b.getSideToMove(), b, getKingSquare(b, b.getSideToMove().flip())) != 0;
     }
 
-    /**
-     * Not sure what all needs to be calculated here. Will need to come back to
-     * this.
-     *
-     * @param b - current board
-     * @param square - kings square
-     * @param isKingMove - true if current move is a king move.
-     * @return
-     */
-    public static boolean isKingChecked(Board b, Square square, boolean isKingMove) {
-
-        Side enemySide = b.getSideToMove();
-        long allPieces = b.getBitBoard();
-        long ownPieces = b.getBitboard(b.getSideToMove().flip());
-
-        long enemyRooks = b.getBitboard(Piece.makePiece(PieceType.ROOK, enemySide));
-        long enemyBishops = b.getBitboard(Piece.makePiece(PieceType.BISHOP, enemySide));
-        long enemyQueens = b.getBitboard(Piece.makePiece(PieceType.QUEEN, enemySide));
-
-        if (isKingMove) {
-            return isKingAttacked(b);
-        }
-        if ((enemyRooks & BitOperations.getRookMoves(square, allPieces, ~ownPieces) | (enemyQueens & BitOperations.getQueenMoves(square, allPieces, ~ownPieces))) != 0L) {  //Open file/rank between rook and king
-            return true;
-        }
-        if ((enemyBishops & BitOperations.getBishopMoves(square, allPieces, ~ownPieces) | (enemyQueens & BitOperations.getQueenMoves(square, allPieces, ~ownPieces))) != 0L) {  //Open diagonal between bishop and king
-            return true;
-        }
-        return false;
-    }
 }

@@ -24,7 +24,6 @@ public class MiniMaxTest {
     BitOperations bitboard;
     MiniMax miniMax;
     MiniMaxAB miniMaxAB;
-    //MiniMaxABZobrist miniMaxZobrist = new MiniMaxABZobrist(b);
 
     /*
     First param is Board itself, second String is the best (expected) play.
@@ -62,11 +61,11 @@ public class MiniMaxTest {
     }
 
     //Normal MiniMax
-    //@Test
+    @Test
     public void testAllSetups() {
         initializeDepth3Setups();
 
-        int depth = 4;
+        int depth = 3;
         int sum = 0;
         for (Board board : setups.keySet()) {
             b = board;

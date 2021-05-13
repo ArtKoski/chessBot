@@ -1,5 +1,6 @@
 package datastructureproject;
 
+import chess.bot.BlunderBot;
 import chess.bot.ChessBot;
 import chess.engine.GameState;
 import datastructureproject.Board.Side;
@@ -11,7 +12,7 @@ import java.util.List;
  */
 public class PerformanceTest {
 
-    private static final ChessBot bot = new TemporaryBot();
+    private static final ChessBot bot = new BlunderBot();
     private static List<GameState> gsList = new ArrayList();
     private static int timeEval = 0;
 
@@ -39,6 +40,7 @@ public class PerformanceTest {
         GameState cur;
         int turns = 100;
         Side side;
+        System.out.println("Running with depth " + 4);
         for (int i = 0; i < turns; i++) {
 
             long startTime = System.currentTimeMillis();
@@ -55,7 +57,7 @@ public class PerformanceTest {
             } else {
                 side = Side.BLACK;
             }
-            System.out.println(side + "'s move: " + move +" | time taken: " +  timeTaken);
+            System.out.println(side + "'s move: " + move + " | time taken: " + timeTaken);
 
         }
         System.out.println("(time) total: " + timeEval + ", avg: " + (timeEval / turns));

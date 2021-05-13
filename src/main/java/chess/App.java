@@ -8,7 +8,7 @@ import chess.connection.LichessAPI;
 import chess.model.Profile;
 import chess.connection.*;
 import datastructureproject.*;
-import datastructureproject.TemporaryBot;
+import chess.bot.BlunderBot;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Map;
@@ -36,7 +36,7 @@ public class App {
         You need to place your bot implementation to the variable below.
         Make sure it implements the interface ChessBot, and don't change the variable name!
          */ 
-        ChessBot bot = new TemporaryBot(); // Your bot here!
+        ChessBot bot = new BlunderBot(); // Your bot here!
 
         if (isLichess) {
             if (token == null) {
