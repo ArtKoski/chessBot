@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import datastructureproject.Board.*;
 import datastructureproject.MiniMaxAB;
+import datastructureproject.MiniMaxAB;
 
 /**
  * Copy of TestBot with miniMax in use.

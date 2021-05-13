@@ -4,24 +4,23 @@
 package chess.bot;
 
 import chess.engine.GameState;
-//import com.github.bhlangonijr.chesslib.move.Move;
+import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-//import com.github.bhlangonijr.chesslib.move.*;
-
-import java.util.Random;
 import datastructureproject.Board.*;
 import datastructureproject.MiniMaxAB;
+import datastructureproject.MovesGenerator;
+import datastructureproject.lists.LinkedList;
 
 public class TestBot implements ChessBot {
 
-    private Random random;
     private Board b;
     private MiniMaxAB minimax;
+    private MovesGenerator moveGenerator;
 
     public TestBot() {
-        this.random = new Random();
         this.b = new Board();
+        moveGenerator = new MovesGenerator();
         minimax = new MiniMaxAB(b);
     }
 
@@ -42,7 +41,7 @@ public class TestBot implements ChessBot {
                 //Transform the move into a UCI string representation
                 return myMove.toString();
             }
-*/
+             */
         } catch (Exception ex) {
             Logger.getLogger(TestBot.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -56,15 +55,14 @@ public class TestBot implements ChessBot {
      * @return A chesslib move
      * @throws MoveGeneratorException if unable to generate legal moves
      */
- /*   public Move getMove() throws MoveGeneratorException {
+    public Move getMove() throws MoveGeneratorException {
         //Uses chesslib's generateLegalMoves() to provide a list of valid moves in the current position
         //Chesslib is not intended to be used by the student.
-        MoveList moves = MoveGenerator.generateLegalMoves(b);
+        LinkedList<Move> moves = moveGenerator.generateLegalMoves(b, true);
 
         //Returns null if no legal moves available, else returns a randomly selected legal move.
         if (moves.size() > 0) {
             return minimax.launch(b, 4);
-//return moves.get(random.nextInt(moves.size()));
         } else {
             return null;
         }

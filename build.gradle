@@ -30,7 +30,7 @@ jacocoTestReport {
      
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: 'chess/*')
+            fileTree(dir: it, exclude: 'chess/**')
         }))
     } 
 }
@@ -43,6 +43,7 @@ repositories {
 }
 
 test {
+    exclude 'chess/**'
     testLogging {
         events "failed"
         exceptionFormat "full"
