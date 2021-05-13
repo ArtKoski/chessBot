@@ -1,23 +1,19 @@
 package datastructureproject.Evaluation;
 
-import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.Piece;
-import com.github.bhlangonijr.chesslib.PieceType;
-import com.github.bhlangonijr.chesslib.Side;
-import com.github.bhlangonijr.chesslib.Square;
+import datastructureproject.Board.*;
 import datastructureproject.BitOperations;
-import datastructureproject.BoardOperations;
 import java.util.HashMap;
 
 /**
+ * First iteration of the evaluator. Kept here just as a reference.
  *
  * @author artkoski
  */
 public class SimpleEvaluator implements BoardEvaluation {
 
-    HashMap<String, Integer> values;
+    static final HashMap<String, Integer> values;
 
-    public SimpleEvaluator() {
+    static {
         values = new HashMap<>();
         values.put("PAWN", 100);
         values.put("KNIGHT", 300);
@@ -72,13 +68,6 @@ public class SimpleEvaluator implements BoardEvaluation {
         }
         return score;
 
-    }
-
-    //Not used atm
-    public boolean isCheckMate(Side side, Board b) {
-        Board opponentsPOV = b.clone();
-        opponentsPOV.setSideToMove(side.flip());
-        return BoardOperations.isCheckMate(b);
     }
 
 }

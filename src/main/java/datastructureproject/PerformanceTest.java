@@ -1,15 +1,13 @@
 package datastructureproject;
 
 import chess.bot.ChessBot;
-import chess.bot.TestBot;
 import chess.engine.GameState;
-import com.github.bhlangonijr.chesslib.move.Move;
+import datastructureproject.Board.Side;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Will be used for performance testing (probably)
- *
+ * Used for testing
  */
 public class PerformanceTest {
 
@@ -32,35 +30,35 @@ public class PerformanceTest {
     }
 
     /**
-     * ATM just testing how long the first 5-15 moves take.
+     * Testing how long the first x moves take.
      *
      * @param args
      */
     public static void main(String[] args) {
         newGame();
         GameState cur;
-        int turns = 10;
-
+        int turns = 100;
+        Side side;
         for (int i = 0; i < turns; i++) {
 
             long startTime = System.currentTimeMillis();
             String move = bot.nextMove(gsList.get(gsList.size() - 1));
             long timeTaken = System.currentTimeMillis() - startTime;
-            System.out.println("time:" + timeTaken);
             timeEval += timeTaken;
-            /*
-            startTime = System.currentTimeMillis();
-            String move2 = bot2.nextMove(gsList.get(gsList.size() - 1));
-            times(timeTaken, System.currentTimeMillis() - startTime);
-             */
+
             cur = new GameState();
             cur.moves.addAll((gsList.get(gsList.size() - 1)).moves);
             cur.moves.add(move);
             gsList.add(cur);
+            if (i % 2 == 0) {
+                side = Side.WHITE;
+            } else {
+                side = Side.BLACK;
+            }
+            System.out.println(side + "'s move: " + move +" | time taken: " +  timeTaken);
 
-            System.out.println("latest move: " + move);
         }
-        System.out.println("tot: " + timeEval + ", avg: " + (timeEval / turns));
+        System.out.println("(time) total: " + timeEval + ", avg: " + (timeEval / turns));
 
     }
 }

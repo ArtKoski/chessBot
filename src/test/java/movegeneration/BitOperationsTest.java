@@ -1,24 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package movegeneration;
 
-import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.Piece;
-import com.github.bhlangonijr.chesslib.Side;
-import com.github.bhlangonijr.chesslib.Square;
-import com.github.bhlangonijr.chesslib.move.Move;
 import datastructureproject.*;
+import datastructureproject.Board.*;
 import datastructureproject.BitOperations;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import datastructureproject.lists.MoveList;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,8 +19,7 @@ public class BitOperationsTest {
 
     MovesGenerator gen;
     Board b;
-    List<com.github.bhlangonijr.chesslib.move.Move> moves;
-    BitOperations bitboard;
+    MoveList moves;
 
     //pre-calculated attack arrays to compare to generated ones (source: bhlangonijr.chesslib) 
     final static long[] knightAttacks = {
@@ -103,7 +89,7 @@ public class BitOperationsTest {
     public BitOperationsTest() {
         b = new Board();
         gen = new MovesGenerator();
-        moves = new ArrayList<>();
+        moves = new MoveList();
 
     }
 
@@ -117,7 +103,6 @@ public class BitOperationsTest {
 
     @Before
     public void setUp() {
-        moves.clear();
         b = new Board();
     }
 
@@ -163,7 +148,7 @@ public class BitOperationsTest {
 
     @Test
     public void squareAttackedByNothing() {
-        long attacks = BitOperations.squareAttackedBy(Side.BLACK, b, Square.E1);
+        long attacks = BitOperations.squareAttackedBy(datastructureproject.Board.Side.BLACK, b, Square.E1);
         assertEquals(attacks, 0L);
     }
 
@@ -183,21 +168,6 @@ public class BitOperationsTest {
         long attacks = BitOperations.squareAttackedBy(Side.BLACK, b, Square.E4);
         assertEquals(0x47000005000L, attacks);
 
-    }
-
-    //@Test ray generation not tested atm. dunno if needed
-    public void rookRays() {
-        /*
-        System.out.println(BitOperations.getBishopRays()[0][63]);
-        System.out.println(BitOperations.getBishopRays()[1][63]);
-        System.out.println(BitOperations.getBishopRays()[2][63]);
-        System.out.println(BitOperations.getBishopRays()[3][63]);
-         
-        System.out.println(BitOperations.getRookRays()[0][63]);
-        System.out.println(BitOperations.getRookRays()[1][63]);
-        System.out.println(BitOperations.getRookRays()[2][63]);
-        System.out.println(BitOperations.getRookRays()[3][63]);
-         */
     }
 
 }

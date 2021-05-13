@@ -1,24 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package movegeneration;
 
-import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.Piece;
-import com.github.bhlangonijr.chesslib.Side;
-import com.github.bhlangonijr.chesslib.Square;
-import com.github.bhlangonijr.chesslib.move.Move;
 import datastructureproject.BitOperations;
+import datastructureproject.Board.*;
 import datastructureproject.Evaluation.BoardEvaluation;
 import datastructureproject.Evaluation.ComplexEvaluator;
-import datastructureproject.Evaluation.ComplexEvaluator;
 import datastructureproject.Evaluation.SimpleEvaluator;
-import datastructureproject.Evaluation.Zobrist;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import datastructureproject.lists.MoveList;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -32,7 +19,7 @@ import static org.junit.Assert.*;
  */
 public class EvaluationTest {
 
-    List<Move> moves;
+    MoveList moves;
     BitOperations bitboard;
     BoardEvaluation simpleEval;
     BoardEvaluation complexEval;
@@ -40,7 +27,7 @@ public class EvaluationTest {
     Board b;
 
     public EvaluationTest() {
-        moves = new ArrayList<>();
+        moves = new MoveList();
         bitboard = new BitOperations();
         simpleEval = new SimpleEvaluator();
         complexEval = new ComplexEvaluator();
@@ -99,12 +86,14 @@ public class EvaluationTest {
 
         b.unsetPiece(Piece.BLACK_KING, Square.H8);
         b.setPiece(Piece.BLACK_KING, Square.F5);
+
         int centerKnightWithCheckEval = complexEval.evaluateBoard(b);
 
         assertTrue(centerKnightWithCheckEval > centerKnightEval);
     }
 
     public void cornerKnightSetup() {
+        b = new Board();
         b.clear();
         b.setPiece(Piece.WHITE_KNIGHT, Square.A1);
         b.setPiece(Piece.WHITE_KING, Square.B2);
@@ -112,6 +101,7 @@ public class EvaluationTest {
     }
 
     public void centerKnightSetup() {
+        b = new Board();
         b.clear();
         b.setPiece(Piece.WHITE_KNIGHT, Square.D4);
         b.setPiece(Piece.WHITE_KING, Square.B2);
@@ -120,12 +110,14 @@ public class EvaluationTest {
 
     @Test
     public void centerPawnBetterThanOnEdge() {
+        b = new Board();
         b.clear();
         b.setPiece(Piece.BLACK_KING, Square.D8);
         b.setPiece(Piece.WHITE_KING, Square.E1);
         b.setPiece(Piece.WHITE_PAWN, Square.E4);
         int centerPawn = complexEval.evaluateBoard(b);
 
+        b = new Board();
         b.clear();
         b.setPiece(Piece.BLACK_KING, Square.D8);
         b.setPiece(Piece.WHITE_KING, Square.E1);
@@ -143,7 +135,7 @@ public class EvaluationTest {
         assertTrue(complexEvalTEST.getPawnBonus(Side.BLACK, Square.E5.ordinal()) == 25);
         assertTrue(complexEvalTEST.getPawnBonus(Side.BLACK, Square.D5.ordinal()) == 25);
     }
-
+    /*
     @Test
     public void ZobristXORworksForHash() {
         long start = Zobrist.getKeyForBoard(b);
@@ -161,20 +153,14 @@ public class EvaluationTest {
         int startScore = 0;
         int scoreAfterE2E4 = 5;
         long startHash = Zobrist.getKeyForBoard(b);
-        Zobrist.updateHash(startHash, startScore);
+        Zobrist.updateHash(startHash, startScore, 1);
 
         b.doMove(new Move(Square.E2, Square.E4));
         long hashE2E4 = Zobrist.getKeyForBoard(b);
-        Zobrist.updateHash(hashE2E4, scoreAfterE2E4);
+        Zobrist.updateHash(hashE2E4, scoreAfterE2E4, 1);
 
         assertTrue(Zobrist.getScoreFromHash(startHash) == startScore);
         assertTrue(Zobrist.getScoreFromHash(hashE2E4) == scoreAfterE2E4);
-    }
-
-    //@Test
-    public void asd() {
-        int evaluate = 10;
-
-    }
+    }*/
 
 }

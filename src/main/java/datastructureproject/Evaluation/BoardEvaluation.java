@@ -1,6 +1,6 @@
 package datastructureproject.Evaluation;
 
-import com.github.bhlangonijr.chesslib.Board;
+import datastructureproject.Board.*;
 
 /**
  * Interface for evaluators.

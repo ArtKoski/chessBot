@@ -30,7 +30,7 @@ jacocoTestReport {
      
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: 'chess/App*')
+            fileTree(dir: it, exclude: 'chess/*')
         }))
     } 
 }
@@ -46,7 +46,11 @@ test {
     testLogging {
         events "failed"
         exceptionFormat "full"
+	
     }
+testLogging.showStandardStreams = true
+
+
 }
 
 run {
@@ -81,3 +85,10 @@ task performanceTest(type:JavaExec) {
    classpath = sourceSets.main.runtimeClasspath
    main = 'datastructureproject.PerformanceTest'
 }
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'datastructureproject.PerformanceTest'
+    }
+}
+

@@ -1,12 +1,9 @@
 package datastructureproject.Evaluation;
 
-import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.Piece;
-import com.github.bhlangonijr.chesslib.Side;
-import com.github.bhlangonijr.chesslib.Square;
 import datastructureproject.BitOperations;
 import datastructureproject.BoardOperations;
 import datastructureproject.MovesGenerator;
+import datastructureproject.Board.*;
 
 /**
  * Extends SimpleEvaluator. Added evaluation metrics are mobility, checks, piece
@@ -18,7 +15,6 @@ public class ComplexEvaluator extends SimpleEvaluator implements BoardEvaluation
 
     MovesGenerator moveGen = new MovesGenerator();
     int CHECK_BONUS = 50;
-    int i = 0;
 
     /**
      * All the tables are from
@@ -93,7 +89,7 @@ public class ComplexEvaluator extends SimpleEvaluator implements BoardEvaluation
 
     @Override
     public int evaluateSide(Side side, Board board) {
-        return evaluateScore(side, board) + (5 * mobilityBonus(side, board)) + checkBonus(side, board);
+        return evaluateScore(side, board) + (int) (0.1 * mobilityBonus(side, board)) + checkBonus(side, board);
     }
 
     /**
@@ -103,43 +99,49 @@ public class ComplexEvaluator extends SimpleEvaluator implements BoardEvaluation
      * @param board - current board
      * @return
      */
-    private int mobilityBonus(Side side, Board board) {
+    private double mobilityBonus(Side side, Board board) {
         Board tempBoard = board.clone();
         tempBoard.setSideToMove(side);
-        return moveGen.generateLegalMoves(tempBoard, false).size();
+        return 1.0 * moveGen.generateLegalMoves(tempBoard, false).size();
     }
 
     private int checkBonus(Side side, Board board) {
         Board tempBoard = board.clone();
-        tempBoard.setSideToMove(side.flip());
+        tempBoard.setSideToMove(side);
         return BoardOperations.isKingAttacked(tempBoard) ? CHECK_BONUS : 0;
     }
 
     /**
      * Otherwise same as SimpleEval's, but also has feature flag for Zobrist
-     * Hashing.
+     * Hashing. (Zobrist not in use :( )
      *
      * @param board - current board
      * @param hash - current hash
      * @param zobristFlag - use Zobrist Hashing or no
+     * @param depth - current depth, for Zobrist Hashing
      * @return
      */
-    public int evaluateBoard(Board board, long hash, boolean zobristFlag) {
-        if (!zobristFlag) {
-            return super.evaluateBoard(board);
-        }
-        Integer score = Zobrist.getScoreFromHash(hash);
-        if (score != null) {
-            return score;
-        }
-        score = evaluateSide(Side.WHITE, board) - evaluateSide(Side.BLACK, board);
-        Zobrist.updateHash(hash, score);
-        return score;
+    public int evaluateBoard(Board board, long hash, boolean zobristFlag, int depth) {
+        //  if (!zobristFlag) {
+        return evaluateSide(Side.WHITE, board) - evaluateSide(Side.BLACK, board);
+        //}
+        /*
+        ZobristUnit unit = Zobrist.getUnitFromHash(hash);
 
+        if (Zobrist.unitExists(hash) && unit.getDepth() < depth) {
+            i++;
+            return unit.getScore();
+        }
+        Integer score = evaluateSide(Side.WHITE, board) - evaluateSide(Side.BLACK, board);
+        freshPositions++;
+        Zobrist.updateHash(hash, score, depth);
+        return score;
+         */
     }
 
     @Override
     public int evaluateScore(Side side, Board board) {
+
         long pieces = board.getBitboard(side);
         int score = 0;
 
@@ -147,16 +149,24 @@ public class ComplexEvaluator extends SimpleEvaluator implements BoardEvaluation
             int pieceIndex = BitOperations.bitScanForward(pieces);
             Piece currentPiece = board.getPiece(Square.squareAt(pieceIndex));
             score += values.get(String.valueOf(currentPiece.getPieceType()));
-            if (String.valueOf(currentPiece.getPieceType()).equals("PAWN")) {
-                score += getPawnBonus(side, pieceIndex);
-            } else if (String.valueOf(currentPiece.getPieceType()).equals("KNIGHT")) {
-                score += getKnightBonus(side, pieceIndex);
-            } else if (String.valueOf(currentPiece.getPieceType()).equals("QUEEN")) {
-                score += getQueenBonus(side, pieceIndex);
-            } else if (String.valueOf(currentPiece.getPieceType()).equals("BISHOP")) {
-                score += getBishopBonus(side, pieceIndex);
-            } else if (String.valueOf(currentPiece.getPieceType()).equals("ROOK")) {
-                score += getRookBonus(side, pieceIndex);
+            switch (String.valueOf(currentPiece.getPieceType())) {
+                case "PAWN":
+                    score += getPawnBonus(side, pieceIndex);
+                    break;
+                case "KNIGHT":
+                    score += getKnightBonus(side, pieceIndex);
+                    break;
+                case "QUEEN":
+                    score += getQueenBonus(side, pieceIndex);
+                    break;
+                case "BISHOP":
+                    score += getBishopBonus(side, pieceIndex);
+                    break;
+                case "ROOK":
+                    score += getRookBonus(side, pieceIndex);
+                    break;
+                default:
+                    break;
             }
 
             pieces = BitOperations.removeLSB(pieces);

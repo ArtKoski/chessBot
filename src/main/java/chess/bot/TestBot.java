@@ -4,14 +4,13 @@
 package chess.bot;
 
 import chess.engine.GameState;
-import com.github.bhlangonijr.chesslib.move.Move;
+//import com.github.bhlangonijr.chesslib.move.Move;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.github.bhlangonijr.chesslib.move.*;
+//import com.github.bhlangonijr.chesslib.move.*;
 
 import java.util.Random;
-
-import com.github.bhlangonijr.chesslib.*;
+import datastructureproject.Board.*;
 import datastructureproject.MiniMaxAB;
 
 public class TestBot implements ChessBot {
@@ -37,13 +36,13 @@ public class TestBot implements ChessBot {
         Move myMove;
         try {
             //Generate a chesslib move based on the position
-            myMove = this.getMove();
+            /*myMove = this.getMove();
 
             if (myMove != null) {
                 //Transform the move into a UCI string representation
                 return myMove.toString();
             }
-
+*/
         } catch (Exception ex) {
             Logger.getLogger(TestBot.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -57,7 +56,7 @@ public class TestBot implements ChessBot {
      * @return A chesslib move
      * @throws MoveGeneratorException if unable to generate legal moves
      */
-    public Move getMove() throws MoveGeneratorException {
+ /*   public Move getMove() throws MoveGeneratorException {
         //Uses chesslib's generateLegalMoves() to provide a list of valid moves in the current position
         //Chesslib is not intended to be used by the student.
         MoveList moves = MoveGenerator.generateLegalMoves(b);

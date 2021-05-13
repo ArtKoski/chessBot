@@ -1,19 +1,8 @@
 package datastructureproject;
 
-import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.Piece;
-import com.github.bhlangonijr.chesslib.PieceType;
-import com.github.bhlangonijr.chesslib.Side;
-import com.github.bhlangonijr.chesslib.Square;
-import com.github.bhlangonijr.chesslib.move.Move;
-import com.github.bhlangonijr.chesslib.move.MoveGenerator;
-//import com.github.bhlangonijr.chesslib.move.MoveList;
+import datastructureproject.Board.*;
 import java.util.Iterator;
-//import java.util.LinkedList;
-//import datastructureproject.lists.LinkedList;
-import datastructureproject.lists.MoveList;
-//import java.util.LinkedList;
-import java.util.List;
+import datastructureproject.lists.LinkedList;
 
 /**
  *
@@ -22,12 +11,12 @@ import java.util.List;
 public class MovesGenerator {
 
     BitOperations bitboard;
-    MoveList moveList;
-    MoveList attacks;
+    LinkedList<Move> moveList;
+    LinkedList attacks;
 
     public MovesGenerator() {
         bitboard = new BitOperations();
-        moveList = new MoveList();
+        moveList = new LinkedList();
     }
 
     /**
@@ -39,9 +28,9 @@ public class MovesGenerator {
      *
      * @return list of legal moves
      */
-    public MoveList generateLegalMoves(Board b, boolean sort) {
-        moveList = new MoveList();
-        attacks = new MoveList();
+    public LinkedList generateLegalMoves(Board b, boolean sort) {
+        moveList = new LinkedList();
+        attacks = new LinkedList();
         long ownPieces = b.getBitboard(b.getSideToMove());
 
         generatePawnMoves(b, moveList);
@@ -53,7 +42,6 @@ public class MovesGenerator {
         generateKingMoves(b, moveList, ownPieces);
 
         filterMoveList(b, sort);
-
         return moveList;
     }
 
@@ -66,10 +54,9 @@ public class MovesGenerator {
      */
     public void filterMoveList(Board b, boolean sort) {
         Move move;
-        int i = 1;
+
         for (Iterator<Move> iterator = moveList.iterator(); iterator.hasNext();) {
             move = iterator.next();
-            i++;
             if (!BoardOperations.isMoveLegal(move, b)) {
                 iterator.remove();
                 continue;
@@ -83,6 +70,7 @@ public class MovesGenerator {
             }
 
         }
+
         attacks.addAll(moveList);
         moveList = attacks;
 
@@ -99,8 +87,8 @@ public class MovesGenerator {
      * @param moveList - list of moves
      * @param ownPieces - bitboard of own pieces for filtering
      */
-    public void generateKnightMoves(Board b, MoveList moveList, long ownPieces) {
-        long knights = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.KNIGHT));
+    public void generateKnightMoves(Board b, LinkedList moveList, long ownPieces) {
+        long knights = b.getBitboard(Piece.makePiece(PieceType.KNIGHT, b.getSideToMove()));
 
         while (knights != 0L) {
             int pieceIndex = BitOperations.bitScanForward(knights);
@@ -119,31 +107,33 @@ public class MovesGenerator {
         }
     }
 
-    public void generateKingMoves(Board b, MoveList moveList, long ownPieces) {
-        long king = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.KING));
+    public void generateKingMoves(Board b, LinkedList moveList, long ownPieces) {
+        long king = b.getBitboard(Piece.makePiece(PieceType.KING, b.getSideToMove()));
 
-        int pieceIndex = BitOperations.bitScanForward(king);
-        Square squareCurrent = Square.squareAt(pieceIndex);
-        long moves = BitOperations.getKingMoves(squareCurrent, ownPieces);
+        if (king != 0L) {
+            int pieceIndex = BitOperations.bitScanForward(king);
+            Square squareCurrent = Square.squareAt(pieceIndex);
+            long moves = BitOperations.getKingMoves(squareCurrent, ownPieces);
 
-        while (moves != 0L) {
-            int targetIndex = BitOperations.bitScanForward(moves);
-            Square squareTarget = Square.squareAt(targetIndex);
-            Move newMove = new Move(squareCurrent, squareTarget, Piece.NONE);
-            moveList.add(newMove);
+            while (moves != 0L) {
+                int targetIndex = BitOperations.bitScanForward(moves);
+                Square squareTarget = Square.squareAt(targetIndex);
+                Move newMove = new Move(squareCurrent, squareTarget, Piece.NONE);
+                moveList.add(newMove);
 
-            moves = BitOperations.removeLSB(moves);
+                moves = BitOperations.removeLSB(moves);
 
+            }
         }
     }
 
-    public void generatePawnMoves(Board b, MoveList moveList) {
-        long pawns = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.PAWN));
+    public void generatePawnMoves(Board b, LinkedList moveList) {
+        long pawns = b.getBitboard(Piece.makePiece(PieceType.PAWN, b.getSideToMove()));
 
         while (pawns != 0L) {
             int pieceIndex = BitOperations.bitScanForward(pawns);
             Square squareCurrent = Square.squareAt(pieceIndex);
-            long moves = BitOperations.getPawnMoves(squareCurrent, b.getSideToMove(), b.getBitboard());
+            long moves = BitOperations.getPawnMoves(squareCurrent, b.getSideToMove(), b.getBitBoard());
 
             while (moves != 0L) {
                 int targetIndex = BitOperations.bitScanForward(moves);
@@ -157,9 +147,9 @@ public class MovesGenerator {
 
     }
 
-    public void generatePawnCaptures(Board b, MoveList moveList) {
+    public void generatePawnCaptures(Board b, LinkedList moveList) {
         long enemyPieces = b.getBitboard(b.getSideToMove().flip());
-        long pawns = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.PAWN));
+        long pawns = b.getBitboard(Piece.makePiece(PieceType.PAWN, b.getSideToMove()));
 
         while (pawns != 0L) {
             int pieceIndex = BitOperations.bitScanForward(pawns);
@@ -177,8 +167,8 @@ public class MovesGenerator {
 
     }
 
-    public void addPawnMoves(Square squareTarget, Square squareCurrent, Side side, MoveList moves) {
-        long targetBB = squareTarget.getBitboard();
+    public void addPawnMoves(Square squareTarget, Square squareCurrent, Side side, LinkedList moves) {
+        long targetBB = squareTarget.getSquareBB();
         if (side.equals(Side.WHITE) && (targetBB & BitOperations.rank[7]) != 0L) {
             moves.add(new Move(squareCurrent, squareTarget, Piece.WHITE_KNIGHT));
             moves.add(new Move(squareCurrent, squareTarget, Piece.WHITE_ROOK));
@@ -195,13 +185,13 @@ public class MovesGenerator {
         }
     }
 
-    public void generateRookMoves(Board b, MoveList moveList) {
-        long rooks = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.ROOK));
+    public void generateRookMoves(Board b, LinkedList moveList) {
+        long rooks = b.getBitboard(Piece.makePiece(PieceType.ROOK, b.getSideToMove()));
 
         while (rooks != 0L) {
             int pieceIndex = BitOperations.bitScanForward(rooks);
             Square squareCurrent = Square.squareAt(pieceIndex);
-            long moves = BitOperations.getRookMoves(squareCurrent, b.getBitboard(), ~b.getBitboard(b.getSideToMove()));
+            long moves = BitOperations.getRookMoves(squareCurrent, b.getBitBoard(), ~b.getBitboard(b.getSideToMove()));
 
             while (moves != 0L) {
                 int targetIndex = BitOperations.bitScanForward(moves);
@@ -217,13 +207,13 @@ public class MovesGenerator {
 
     }
 
-    public void generateBishopMoves(Board b, MoveList moveList) {
-        long bishops = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.BISHOP));
+    public void generateBishopMoves(Board b, LinkedList moveList) {
+        long bishops = b.getBitboard(Piece.makePiece(PieceType.BISHOP, b.getSideToMove()));
 
         while (bishops != 0L) {
             int pieceIndex = BitOperations.bitScanForward(bishops);
             Square squareCurrent = Square.squareAt(pieceIndex);
-            long moves = BitOperations.getBishopMoves(squareCurrent, b.getBitboard(), ~b.getBitboard(b.getSideToMove()));
+            long moves = BitOperations.getBishopMoves(squareCurrent, b.getBitBoard(), ~b.getBitboard(b.getSideToMove()));
 
             while (moves != 0L) {
                 int targetIndex = BitOperations.bitScanForward(moves);
@@ -239,14 +229,14 @@ public class MovesGenerator {
 
     }
 
-    public void generateQueenMoves(Board b, MoveList moveList) {
-        long queens = b.getBitboard(Piece.make(b.getSideToMove(), PieceType.QUEEN));
+    public void generateQueenMoves(Board b, LinkedList moveList) {
+        long queens = b.getBitboard(Piece.makePiece(PieceType.QUEEN, b.getSideToMove()));
 
         while (queens != 0L) {
             int pieceIndex = BitOperations.bitScanForward(queens);
             Square squareCurrent = Square.squareAt(pieceIndex);
 
-            long moves = BitOperations.getQueenMoves(squareCurrent, b.getBitboard(), ~b.getBitboard(b.getSideToMove()));
+            long moves = BitOperations.getQueenMoves(squareCurrent, b.getBitBoard(), ~b.getBitboard(b.getSideToMove()));
 
             while (moves != 0L) {
                 int targetIndex = BitOperations.bitScanForward(moves);

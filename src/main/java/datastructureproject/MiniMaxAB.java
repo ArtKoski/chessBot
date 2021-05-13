@@ -1,12 +1,11 @@
 package datastructureproject;
 
 import datastructureproject.Evaluation.BoardEvaluation;
-import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.move.Move;
+
+import datastructureproject.Board.*;
 import datastructureproject.Evaluation.*;
 import datastructureproject.lists.LinkedList;
-import datastructureproject.lists.MoveList;
-import java.util.List;
+
 
 /**
  * MiniMax with Alpha-Beta pruning. Otherwise works like regular MiniMax class,
@@ -19,6 +18,7 @@ public class MiniMaxAB {
 
     private MovesGenerator moveGenerator;
     private BoardEvaluation evaluator;
+    int branches = 0;
 
     int highestValue;
     int lowestValue;
@@ -37,14 +37,16 @@ public class MiniMaxAB {
         highestValue = Integer.MIN_VALUE;
         lowestValue = Integer.MAX_VALUE;
 
-        MoveList moves = moveGenerator.generateLegalMoves(board, true);
+        LinkedList<Move> moves = moveGenerator.generateLegalMoves(board, true);
 
         Move bestMove = null;
 
         int currentValue;
         Board tempBoard = board.clone();
 
-        for (Move move : moves) {
+        for (Object moveObj : moves) {
+
+            Move move = (Move) moveObj;
             tempBoard.doMove(move);
             currentValue = (isWhiteTurn(tempBoard))
                     ? max(tempBoard, (depth - 1), highestValue, lowestValue)
@@ -61,6 +63,7 @@ public class MiniMaxAB {
             }
         }
 
+        //System.out.println("positions calculated " + branches);
         return bestMove;
     }
 
@@ -74,18 +77,20 @@ public class MiniMaxAB {
      * @return best score for black
      */
     public int min(Board board, int depth, int alpha, int beta) {
-
-        if (BoardOperations.isGameOver(board)) {
+        LinkedList<Move> moves = moveGenerator.generateLegalMoves(board, true);
+        if (moves.isEmpty() && BoardOperations.isGameOver(board)) {
             return depth * 10000;
         }
 
-        if (depth == 0/* || BoardOperations.isGameOver(board)*/) {
+        if (depth == 0) {
+            branches++;
             return evaluator.evaluateBoard(board);
         }
 
         int lowestCurrentValue = Integer.MAX_VALUE;
-        for (Move move : moveGenerator.generateLegalMoves(board, true)) {
-            board.doMove(move, false);
+        for (Object moveObj : moves) {
+            Move move = (Move) moveObj;
+            board.doMove(move);
             int whitesBestMove = max(board, (depth - 1), alpha, beta);
             board.undoMove();
 
@@ -100,13 +105,6 @@ public class MiniMaxAB {
             if (lowestCurrentValue < beta) {
                 beta = lowestCurrentValue;
 
-                /*
-            lowestCurrentValue = Math.min(whitesBestMove, lowestCurrentValue);
-
-            beta = Math.min(beta, whitesBestMove);
-            if (beta <= alpha) {
-                return Integer.MIN_VALUE;
-            }*/
             }
         }
 
@@ -123,18 +121,20 @@ public class MiniMaxAB {
      * @return best score for white
      */
     public int max(Board board, int depth, int alpha, int beta) {
-
-        if (BoardOperations.isGameOver(board)) {
+        LinkedList<Move> moves = moveGenerator.generateLegalMoves(board, true);
+        if (moves.isEmpty() && BoardOperations.isGameOver(board)) {
             return depth * -10000;
         }
 
-        if (depth == 0/* || BoardOperations.isGameOver(board)*/) {
+        if (depth == 0) {
+            branches++;
             return evaluator.evaluateBoard(board);
         }
 
         int highestCurrentValue = Integer.MIN_VALUE;
-        for (Move move : moveGenerator.generateLegalMoves(board, true)) {
-            board.doMove(move, false);
+        for (Object moveObj : moves) {
+            Move move = (Move) moveObj;
+            board.doMove(move);
             int blacksBestMove = min(board, (depth - 1), alpha, beta);
             board.undoMove();
 
@@ -151,16 +151,6 @@ public class MiniMaxAB {
             }
         }
 
-        /*
-        highestCurrentValue = Math.max(highestCurrentValue, blacksBestMove);
-
-            alpha = Math.max(alpha, blacksBestMove);
-            if (beta <= alpha) {
-                return Integer.MAX_VALUE;
-            }
-        }
-
-         */
         return highestCurrentValue;
     }
 }

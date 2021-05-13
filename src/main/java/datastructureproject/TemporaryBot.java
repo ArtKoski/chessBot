@@ -2,12 +2,9 @@ package datastructureproject;
 
 import chess.bot.ChessBot;
 import chess.engine.GameState;
-import com.github.bhlangonijr.chesslib.move.Move;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.github.bhlangonijr.chesslib.move.*;
-import java.util.Random;
-import com.github.bhlangonijr.chesslib.*;
+import datastructureproject.Board.*;
 
 /**
  * Copy of TestBot with miniMax in use.
@@ -26,7 +23,7 @@ public class TemporaryBot implements ChessBot {
 
     /**
      * @param gs Current gamestate
-     * @return UCI String representation of a mvoe
+     * @return UCI String representation of a move
      */
     @Override
     public String nextMove(GameState gs) {
@@ -58,10 +55,9 @@ public class TemporaryBot implements ChessBot {
      * @return A chesslib move
      * @throws MoveGeneratorException if unable to generate legal moves
      */
-    public Move getMove() throws MoveGeneratorException {
+    /*public Move getMove() throws MoveGeneratorException {
         return null;
-    }
-
+    }*/
     public Board getBoard() {
         return this.b;
     }
@@ -121,6 +117,7 @@ public class TemporaryBot implements ChessBot {
                 Square.fromValue(starting),
                 Square.valueOf(ending)) : new Move(Square.fromValue(starting),
                 Square.valueOf(ending), Piece.fromValue(promotionPiece));
+
         this.b.doMove(latestMove);
     }
 }

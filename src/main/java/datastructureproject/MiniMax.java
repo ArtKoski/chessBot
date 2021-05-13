@@ -1,11 +1,10 @@
 package datastructureproject;
 
 import datastructureproject.Evaluation.BoardEvaluation;
-import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.move.Move;
+
+import datastructureproject.Board.*;
 import datastructureproject.Evaluation.*;
-import datastructureproject.lists.MoveList;
-import java.util.List;
+import datastructureproject.lists.*;
 
 /**
  *
@@ -18,6 +17,7 @@ public class MiniMax {
 
     private MovesGenerator moveGenerator;
     private BoardEvaluation evaluator;
+    int branches = 0;
 
     public MiniMax(Board b) {
         moveGenerator = new MovesGenerator();
@@ -38,7 +38,7 @@ public class MiniMax {
      */
     public Move launch(Board board, int depth) {
 
-        MoveList moves = moveGenerator.generateLegalMoves(board, true);
+        LinkedList<Move> moves = moveGenerator.generateLegalMoves(board, true);
 
         Move bestMove = null;
 
@@ -47,7 +47,8 @@ public class MiniMax {
         int currentValue;
         Board tempBoard = board.clone();
 
-        for (Move move : moves) {
+        for (Object moveObj : moves) {
+            Move move = (Move) moveObj;
             tempBoard.doMove(move);
             currentValue = (isWhiteTurn(tempBoard))
                     ? max(tempBoard, (depth - 1))
@@ -64,7 +65,7 @@ public class MiniMax {
             }
 
         }
-
+        //System.out.println("positions calculated " + branches);
         return bestMove;
     }
 
@@ -83,11 +84,14 @@ public class MiniMax {
         }
 
         if (depth == 0) {
+            branches++;
             return evaluator.evaluateBoard(board);
         }
 
         int lowestValue = Integer.MAX_VALUE;
-        for (Move move : moveGenerator.generateLegalMoves(board, true)) {
+        for (Object moveObj : moveGenerator.generateLegalMoves(board, true)) {
+
+            Move move = (Move) moveObj;
             board.doMove(move);
             int enemysBestMove = max(board, (depth - 1));
             board.undoMove();
@@ -114,11 +118,13 @@ public class MiniMax {
             return depth * -10000;
         }
         if (depth == 0) {
+            branches++;
             return evaluator.evaluateBoard(board);
         }
 
         int highestValue = Integer.MIN_VALUE;
-        for (Move move : moveGenerator.generateLegalMoves(board, true)) {
+        for (Object moveObj : moveGenerator.generateLegalMoves(board, true)) {
+            Move move = (Move) moveObj;
             board.doMove(move);
             int enemysBestMove = min(board, (depth - 1));
             board.undoMove();

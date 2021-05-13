@@ -1,24 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package movegeneration;
 
-import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.Piece;
-import com.github.bhlangonijr.chesslib.PieceType;
-import com.github.bhlangonijr.chesslib.Side;
-import com.github.bhlangonijr.chesslib.Square;
-import com.github.bhlangonijr.chesslib.move.Move;
-import com.github.bhlangonijr.chesslib.move.MoveGenerator;
-import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
-
+import datastructureproject.Board.*;
 import datastructureproject.BitOperations;
 import datastructureproject.MovesGenerator;
-import datastructureproject.lists.MoveList;
-import java.util.ArrayList;
-import java.util.List;
+import datastructureproject.lists.LinkedList;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -34,15 +19,12 @@ public class MoveGeneratorTest {
 
     MovesGenerator gen;
     Board b;
-    MoveList moves;
-    BitOperations bitboard;
+    LinkedList<Move> moves;
 
     public MoveGeneratorTest() {
         b = new Board();
         gen = new MovesGenerator();
-        moves = new MoveList();
-        bitboard = new BitOperations();
-
+        moves = new LinkedList();
     }
 
     @BeforeClass
@@ -222,11 +204,12 @@ public class MoveGeneratorTest {
     }
 
     public void assertThatPromotionMovesAvailable(String side) {
-        for (Move move : moves) {
-            assertTrue(move.getPromotion().equals(Piece.make(Side.fromValue(side), PieceType.fromValue("KNIGHT")))
-                    | move.getPromotion().equals(Piece.make(Side.fromValue(side), PieceType.fromValue("ROOK")))
-                    | move.getPromotion().equals(Piece.make(Side.fromValue(side), PieceType.fromValue("BISHOP")))
-                    | move.getPromotion().equals(Piece.make(Side.fromValue(side), PieceType.fromValue("QUEEN"))));
+        for (Object mObj : moves) {
+            Move move = (Move) mObj;
+            assertTrue(move.getPromotion().equals(Piece.makePiece(PieceType.fromValue("KNIGHT"), Side.fromValue(side)))
+                    | move.getPromotion().equals(Piece.makePiece(PieceType.fromValue("ROOK"), Side.fromValue(side)))
+                    | move.getPromotion().equals(Piece.makePiece(PieceType.fromValue("BISHOP"), Side.fromValue(side)))
+                    | move.getPromotion().equals(Piece.makePiece(PieceType.fromValue("QUEEN"), Side.fromValue(side))));
         }
     }
 
@@ -399,33 +382,10 @@ public class MoveGeneratorTest {
         assertEquals(27, moves.size());
     }
 
-    //RANDOM
-    //@Test
-    public void moveFilterWorksProperly() {
-        b.clear();
-        b.setPiece(Piece.WHITE_KING, Square.B5);
-        b.setPiece(Piece.WHITE_QUEEN, Square.A1);
-        b.setPiece(Piece.BLACK_QUEEN, Square.H1);
-        b.setPiece(Piece.BLACK_KING, Square.G5);
-
-        moves = gen.generateLegalMoves(b, true);
-        //System.out.println(moves);
+    @Test
+    public void totalMovesAtStart() {
+        assertEquals(20,
+                gen.generateLegalMoves(b, true).size());
     }
 
-    //@Test
-    public void generatingMovesIsNotTooSlow() throws MoveGeneratorException {
-        b.loadFromFen("r1b1kb1r/pppp1ppp/5q2/4n3/3KP3/2N3PN/PPP4P/R1BQ1B1R b kq");
-        long startTime = System.currentTimeMillis();
-        gen.generateLegalMoves(b, false);
-        long myTime = (System.currentTimeMillis() - startTime);
-
-        startTime = System.currentTimeMillis();
-        MoveGenerator.generateLegalMoves(b);
-        long chessLibTime = (System.currentTimeMillis() - startTime);
-
-        System.out.println(myTime + " vs " + chessLibTime);
-
-        System.out.println("chessLib was " + ((1.0 * myTime) / (1.0 * chessLibTime)) + " times faster");
-
-    }
 }

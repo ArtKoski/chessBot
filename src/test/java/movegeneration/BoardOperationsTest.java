@@ -1,20 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package movegeneration;
 
-import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.Piece;
-import com.github.bhlangonijr.chesslib.Side;
-import com.github.bhlangonijr.chesslib.Square;
-import com.github.bhlangonijr.chesslib.move.Move;
+import datastructureproject.Board.*;
 import datastructureproject.BoardOperations;
 import datastructureproject.MovesGenerator;
-import datastructureproject.lists.MoveList;
-import java.util.ArrayList;
-import java.util.List;
+import datastructureproject.lists.LinkedList;
+import java.util.HashMap;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -29,13 +19,15 @@ import static org.junit.Assert.*;
 public class BoardOperationsTest {
 
     Board b;
-    MoveList moves;
+    LinkedList<Move> moves;
     MovesGenerator gen;
+    static HashMap<Move, Boolean> legalMoves;
 
     public BoardOperationsTest() {
+        legalMoves = new HashMap<>();
         b = new Board();
         gen = new MovesGenerator();
-        moves = new MoveList();
+        moves = new LinkedList();
 
     }
 
@@ -69,6 +61,16 @@ public class BoardOperationsTest {
         b.setSideToMove(Side.WHITE);
     }
 
+    //@Test
+    public void illegalSetup() {
+        b.clear();
+        b.setPiece(Piece.WHITE_KING, Square.C3);
+        b.setPiece(Piece.BLACK_KING, Square.C2);
+        Move move = new Move(Square.C3, Square.C2);
+        legalMoves.put(move, Boolean.FALSE);
+        assertMoveIsLegal(move, b);
+    }
+
     /**
      * This is supposed to be used with specific setup of CheckTestingSetup.
      */
@@ -81,16 +83,19 @@ public class BoardOperationsTest {
         moves.add(new Move(Square.C3, Square.D4));    //Rook check
         moves.add(new Move(Square.E3, Square.E4));    //Queen discover check
 
+        for (Object mObj : moves) {
+            Move m = (Move) mObj;
+            legalMoves.put(m, Boolean.FALSE);
+        }
+
         //LEGAL MOVES
         moves.add(new Move(Square.C3, Square.B4));    //Legal rook capture
         moves.add(new Move(Square.C3, Square.D2));    //Legal move
-    }
 
-    //@Test
-    public void bugFixing() {
-        b.loadFromFen("r1b1kb1r/pppp1ppp/5q2/8/4P3/2NnK1PN/PPP4P/R1BQ1B1R b");
-        Move move = new Move(Square.F6, Square.D8);
-        assertMoveIsLegal(move, b);
+        for (Object mObj : moves) {
+            Move m = (Move) mObj;
+            legalMoves.putIfAbsent(m, Boolean.TRUE);
+        }
 
     }
 
@@ -98,39 +103,19 @@ public class BoardOperationsTest {
     public void isMoveLegal() {
         CheckTestingSetup();
         setMovesList();
-        moves.forEach((move) -> {
-            assertMoveIsLegal(move, b);
+        moves.forEach((moveObj) -> {
+            Move m = (Move) moveObj;
+            assertMoveIsLegal(m, b);
         });
-    }
-
-    @Test
-    public void asssd() {
-        CheckTestingSetup();
-        moves = gen.generateLegalMoves(b, true);
-        System.out.println("moves: " + moves);
     }
 
     public static void assertMoveIsLegal(Move move, Board b) {
         try {
-            assertEquals(b.isMoveLegal(move, true), BoardOperations.isMoveLegal(move, b));
+            assertEquals(legalMoves.get(move), BoardOperations.isMoveLegal(move, b));
         } catch (AssertionError e) {
             System.out.println(move.toString() + " - failed");
             throw e;
         }
     }
 
-    //@Test
-    public void isEnemyKingChecked() {
-        b.clear();
-        b.setPiece(Piece.WHITE_KING, Square.C3);
-        b.setPiece(Piece.WHITE_PAWN, Square.E3);
-        b.setPiece(Piece.BLACK_ROOK, Square.B4);
-        b.setPiece(Piece.BLACK_KING, Square.H8);
-        b.setPiece(Piece.BLACK_PAWN, Square.D5);
-        b.setPiece(Piece.BLACK_KNIGHT, Square.D4);
-        b.setPiece(Piece.BLACK_QUEEN, Square.F3);
-        b.setSideToMove(Side.BLACK);
-        MoveList asd = gen.generateLegalMoves(b, true);
-        System.out.println();
-    }
 }
