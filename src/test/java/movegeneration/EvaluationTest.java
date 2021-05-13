@@ -5,7 +5,7 @@ import datastructureproject.Board.*;
 import datastructureproject.Evaluation.BoardEvaluation;
 import datastructureproject.Evaluation.ComplexEvaluator;
 import datastructureproject.Evaluation.SimpleEvaluator;
-import datastructureproject.lists.MoveList;
+import datastructureproject.lists.LinkedList;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
  */
 public class EvaluationTest {
 
-    MoveList moves;
+    LinkedList<Move> moves;
     BitOperations bitboard;
     BoardEvaluation simpleEval;
     BoardEvaluation complexEval;
@@ -27,7 +27,7 @@ public class EvaluationTest {
     Board b;
 
     public EvaluationTest() {
-        moves = new MoveList();
+        moves = new LinkedList<>();
         bitboard = new BitOperations();
         simpleEval = new SimpleEvaluator();
         complexEval = new ComplexEvaluator();

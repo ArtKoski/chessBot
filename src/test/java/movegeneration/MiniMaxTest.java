@@ -3,7 +3,7 @@ package movegeneration;
 import datastructureproject.Board.*;
 import datastructureproject.BitOperations;
 import datastructureproject.*;
-import datastructureproject.lists.MoveList;
+import datastructureproject.lists.LinkedList;
 import java.util.HashMap;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -20,7 +20,7 @@ public class MiniMaxTest {
 
     MovesGenerator gen;
     Board b;
-    MoveList moves;
+    LinkedList<Move> moves;
     BitOperations bitboard;
     MiniMax miniMax;
     MiniMaxAB miniMaxAB;
@@ -33,7 +33,7 @@ public class MiniMaxTest {
     public MiniMaxTest() {
         b = new Board();
         gen = new MovesGenerator();
-        moves = new MoveList();
+        moves = new LinkedList<>();
         bitboard = new BitOperations();
         miniMax = new MiniMax(b);
         miniMaxAB = new MiniMaxAB(b);

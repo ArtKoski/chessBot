@@ -3,7 +3,7 @@ package movegeneration;
 import datastructureproject.*;
 import datastructureproject.Board.*;
 import datastructureproject.BitOperations;
-import datastructureproject.lists.MoveList;
+import datastructureproject.lists.LinkedList;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -19,7 +19,7 @@ public class BitOperationsTest {
 
     MovesGenerator gen;
     Board b;
-    MoveList moves;
+    LinkedList<Move> moves;
 
     //pre-calculated attack arrays to compare to generated ones (source: bhlangonijr.chesslib) 
     final static long[] knightAttacks = {
@@ -89,7 +89,7 @@ public class BitOperationsTest {
     public BitOperationsTest() {
         b = new Board();
         gen = new MovesGenerator();
-        moves = new MoveList();
+        moves = new LinkedList();
 
     }
 
