@@ -59,6 +59,9 @@ Syvyydellä 3 luokka PerformanceTest laskee pelin ensimmäisellä siirrolla ~900
 MinimaxAB sen sijaan laskee samassa tilanteessa samalla syvyydellä vain ~2000 tilannetta. 
 Minulla ei ole syytä olettaa, että tilavaativuudet eroaisivat teoreettisista vaativuuksista.
 
+### Pelaako botti hyvin?
+Botilla on melko oudot aloitukset, ja välillä tekee tyhmiä 'vaihtokauppoja' lähinnä alhaisen syvyyden (<6) takia. Lichessissä se pärjää jopa 1500 ELO-botteja vastaan, eikä se edes osaa linnoitusta. Sanoisin siis, että botti pelaa ainakin keskiverto shakkipelaajan näkökulmasta ihan hyvin.
+
 --------------------
 
 
