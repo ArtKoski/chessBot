@@ -1,14 +1,10 @@
 [![codecov](https://codecov.io/gh/ArtKoski/chessBot/branch/master/graph/badge.svg?token=7OF4D55JQ9)](https://codecov.io/gh/ArtKoski/chessBot)
 
 
-Tällä hetkellä kaikki tekemäni löytyy [datastructureproject:in alta](https://github.com/ArtKoski/chessBot/tree/master/src/main/java/datastructureproject)  
-___________________
-Bottia voi simuloida ilman lichess-yhteyttä komennolla  
-``` ./gradlew run PerformanceTest ```  
-Botti pelaa tällöin 'itseään vastaan', ja liikkeet tulostuu terminaaliin (Voi nopeuttaa datastructurebot.TemporaryBot.java riviltä 38 laittamalla toiseksi argumentiksi numeron 3).  
-Kyseisellä luokalla on tarkoitus tehdä tehokkuustestejä myöhemmin.  
+Suurin osa tämän projektin teoksista löytyy [datastructureproject:in alta](https://github.com/ArtKoski/chessBot/tree/master/src/main/java/datastructureproject)  
 
 _____________________
+[Käyttöohje](https://github.com/ArtKoski/chessBot/blob/master/documentation/teko%C3%A4ly/K%C3%A4ytt%C3%B6ohje.md)
 
 [Määrittelydokumentti](https://github.com/ArtKoski/chessBot/blob/306b9cdf73cc64abe262886b437bddcbfec0235a/documentation/teko%C3%A4ly/M%C3%A4%C3%A4rittelydokumentti.md)
 
