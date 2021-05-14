@@ -5,7 +5,9 @@ Selkeästi eroavat kokonaisuudet ovat:
 - Liikkeiden generointi -> luokat BitOperations/MoveGenerator
 - MiniMax ja sen sovellukset -> luokat MiniMax, MiniMaxAB
 - Evaluation (pelitilanteen arvionti) -> luokat datastructureproject.Evaluation
-- Itse laudan toiminta -> luokat datastructureproject.Board
+- Itse laudan toiminta -> luokat datastructureproject.Board  
+
+Monissa luokissa olen ottanut mallia chessLibin toteutuksista, eteenkin bitboardiin liittyvissä luokissa (Board, MoveGenerator, BitOperations).
 
 ---------------
 
@@ -70,10 +72,15 @@ Minulla ei ole syytä olettaa, että tilavaativuudet eroaisivat teoreettisista v
 - Zobrist Hashing olisi ollut kiva saada toimimaan kunnolla (käytin siihen kuitenkin ~10 tuntia)
 - LinkedList sama homma (myös >5 tuntia 'hukkaan')
 - Liikegeneroinnista puuttuu: linnoitus ja en passant
+- isGameOver -metodi tarkistaa vain checkMaten. Eli puuttuu staleMate/insufficientMaterial/repetition tasapelien tarkistaminen.
+- Board ei osaa lukea FEN-stringejä ja muuttaa niitä pelitilanteeksi. Tämä olisi auttanut esim. testaamisessa.
 
 ### Lähteitä
 ['Liukuvien' hyökkäysten](https://www.chessprogramming.org/Hyperbola_Quintessence) laskemiseen käytetty temppu.
 [BitBoard operaatioiden](https://github.com/bhlangonijr/chesslib/tree/e6acbcb9d429c08918774edb2647b6f8e88db1cc/src/main/java/com/github/bhlangonijr/chesslib) käyttö. 
 [Evaluation](https://adamberent.com/2019/03/02/chess-board-evaluation/) tauluja
 [LinkedList ](https://www.youtube.com/watch?v=WEW7QkLFvko)(en edes saanut toimimaan)
-
+[Zobrist](https://www.youtube.com/watch?v=FJveL2kV4wc&list=PLQV5mozTHmacMeRzJCW_8K3qw2miYqd0c&index=32) juttuja (en saanut valmiiksi :( )
+[MiniMaxin](https://github.com/carterjbastian/alpha-beta-chess-ai/blob/master/chess-ai.pdf) ymmärtämiseen
+[TODELLA hyödyllinen](https://gekomad.github.io/Cinnamon/BitboardCalculator/) työkalu bitboardien ymmärtämiseen/tekemiseen
+[fen-tilanne kuvaksi](www.fen-to-image.com/)
