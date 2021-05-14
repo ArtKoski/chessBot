@@ -83,4 +83,3 @@ Minulla ei ole syytä olettaa, että tilavaativuudet eroaisivat teoreettisista v
 [Zobrist](https://www.youtube.com/watch?v=FJveL2kV4wc&list=PLQV5mozTHmacMeRzJCW_8K3qw2miYqd0c&index=32) juttuja (en saanut valmiiksi :( )  
 [MiniMaxin](https://github.com/carterjbastian/alpha-beta-chess-ai/blob/master/chess-ai.pdf) ymmärtämiseen  
 [TODELLA hyödyllinen](https://gekomad.github.io/Cinnamon/BitboardCalculator/) työkalu bitboardien ymmärtämiseen/tekemiseen  
-[fen-tilanne kuvaksi](www.fen-to-image.com/)  
