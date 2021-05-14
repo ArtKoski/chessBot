@@ -12,6 +12,11 @@ import datastructureproject.lists.LinkedList;
  */
 public class Board implements Cloneable {
 
+    private static final Move WHITE_KS = new Move(Square.E1, Square.G1);
+    private static final Move WHITE_QS = new Move(Square.E1, Square.C1);
+    private static final Move BLACK_KS = new Move(Square.E8, Square.G8);
+    private static final Move BLACK_QS = new Move(Square.E8, Square.C8);
+
     private Side sideToMove;
     /**
      * Contains bitboards for each piece. Indexes are same as Piece.ordinals.
@@ -127,22 +132,38 @@ public class Board implements Cloneable {
         return this.sideToMove;
     }
 
+    public boolean isCastleMove(Move move) {
+        return move.equals(WHITE_KS) | move.equals(WHITE_QS) | move.equals(BLACK_KS) | move.equals(BLACK_QS);
+    }
+
     /**
      * Makes a move on the board. Assumes that move is legal.
      *
      * @param move - the move to be realized
      */
     public void doMove(Move move) {
+        Piece pieceFrom;
+        Piece pieceTo;
+
         history.addFirst(move);
         pieceHistory.addFirst(pieces[move.getFrom().ordinal()]);
         targetPieceHistory.addFirst(pieces[move.getTo().ordinal()]);
 
-        Piece pieceTo = getPiece(move.getTo());
-        Piece pieceFrom = getPiece(move.getFrom());
-        updateBitBoards(move, pieceFrom, pieceTo);
+        pieceFrom = getPiece(move.getFrom());
+        pieceTo = getPiece(move.getTo());
 
-        pieces[move.getTo().ordinal()] = pieces[move.getFrom().ordinal()];
-        pieces[move.getFrom().ordinal()] = Piece.NONE;
+        if (move.getPromotion()
+                != Piece.NONE) {
+            unsetPiece(pieceFrom, move.getFrom());
+            setPiece(move.getPromotion(), move.getTo());
+            pieces[move.getTo().ordinal()] = move.getPromotion();
+        } else {
+            updateBitBoards(move, pieceFrom, pieceTo);
+            pieces[move.getTo().ordinal()] = pieces[move.getFrom().ordinal()];
+
+        }
+        pieces[move.getFrom()
+                .ordinal()] = Piece.NONE;
         setSideToMove(getSideToMove().flip());
     }
 

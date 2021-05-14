@@ -145,4 +145,15 @@ public class BitBoardTest {
 
     }
 
+    @Test
+    public void promotionMoveWorks() {
+        Move move = new Move(Square.E7, Square.E8, Piece.WHITE_QUEEN);
+        b = new Board();
+        b.clear();
+        b.setPiece(Piece.WHITE_PAWN, Square.E7);
+        b.doMove(move);
+        assertEquals(Piece.WHITE_QUEEN, b.getPiece(Square.E8));
+        assertEquals(0, b.getBitboard(Piece.WHITE_PAWN));
+    }
+
 }
