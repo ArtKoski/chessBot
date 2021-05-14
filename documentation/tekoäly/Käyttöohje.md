@@ -1,7 +1,8 @@
 ## Käyttöohje 
-*Jos* kiinnostaa tehdä tai on jo olemassa Lichess-botti -tunnus, niin botilla voit pelata muita lichess-botteja vastaan. [täältä](https://github.com/ArtKoski/chessBot/blob/master/documentation/projektiPohja/Beginners_guide.md#playing-on-lichess) löytyy ohjeet.
+*Jos* kiinnostaa tehdä tai on jo olemassa Lichess-botti -tunnus, niin botilla voit pelata muita lichess-botteja vastaan. [täältä](https://github.com/ArtKoski/chessBot/blob/master/documentation/projektiPohja/Beginners_guide.md#playing-on-lichess) löytyy ohjeet. Myös XBoard (varmaankin) toimii, mutta en ole itse sitä käyttänyt.
 (TLDR; Kun lichess-botti on olemassa, tarvitset botin 'tokenin'. Avaa lichessissä peli bottia vastaan ja aja
 ```./gradlew run --args="--lichess --token=put_token_here" ``` omalla tokenilla.)
+
 #### Jos ei,
 niin botin toimintaa simuloi PerformanceTest -luokka, joka käynnistyy *jar*:ista. 
 
