@@ -23,25 +23,25 @@ Ensimmäiset **10 siirtoa** taas vaativat hieman enemmän laskentaa.
 |  avg. aika (per siirto)| 23s | < 1 s
 | Vaihtelu (s) | [7 ; 33] s | [0.1 ; 1.2] s  
 |Testit läpi | Kyllä | Kyllä 
-| Arvionteja laskettu yht. | ~1 Miljoona  | 12 000 
+| Arviointeja laskettu yht. | ~1 Miljoona  | 12 000 
 |**Syvyys 5** | | 
 | avg. aika | Hyvin pitkään | ~2 s
 | Vaihtelu | Suurta| [1 ; 6] s 
 | Testit läpi | ? | Kyllä
-| Arvionteja laskettu yht. | -  | 100 000
+| Arviointeja laskettu yht. | -  | 100 000
 #### Pelin alku (10 siirtoa)
 
 | |   MiniMax | MiniMax w/ AB Pruning
 |---	|---		|---	|
 | **Syvyys 3** | | 
 | avg. aika | ~ 2 s | ~0.3 s
-| Arvionteja laskettu yht. | 200 000 | 20 000
+| Arviointeja laskettu yht. | 200 000 | 20 000
 |**Syvyys 4** | |
 | avg. aika | >20 s | ~ 2.5 s
-| Arvionteja laskettu yht.| 200 000 jo ensimmäiseen siirtoon | 200 000
+| Arviointeja laskettu yht.| 200 000 jo ensimmäiseen siirtoon | 200 000
 |**Syvyys 5** | |
 | avg. aika | - | ~ 17 s
-| Liikkeitä laskettu yht. | 20^5? | 1 300 000
+| Arviointeja laskettu yht. | 20^5? | 1 300 000
 
 #### Yhteenveto tehokkuustesteistä
 AB-pruning selkeästi vähentää laskettavien polkujen määrää. Helpoissa puzzleissa päästään parhaimmillaan jopa satakertaisiin eroihin, joka itse AB-pruning -toiminnan ohella johtuu 
